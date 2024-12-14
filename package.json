@@ -1,0 +1,19 @@
+{
+  "name": "qommand",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "node bin/dev.js"
+  },
+  "author": "Ian Wijma (https://ian.wij.ma/)",
+  "license": "",
+  "description": "Running Commands",
+  "workspaces": [
+    "packages/common",
+    "packages/frontend",
+    "packages/backend"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
