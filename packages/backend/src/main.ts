@@ -1,6 +1,7 @@
 import {app, BrowserWindow} from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
+import {isDev} from "./utils/isDev";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -10,22 +11,33 @@ if (started) {
 const createWindow = () => {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 600,
+        width: 1280,
+        height: 800,
+        minHeight: 800,
+        minWidth: 1280,
+        frame: false,
+        autoHideMenuBar: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
         },
     });
 
     // and load the index.html of the app.
-    if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    if (isDev()) {
         mainWindow.loadURL('http://localhost:3000');
     } else {
+        // TODO: Update
         mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
     }
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    if (isDev()) {
+        mainWindow.webContents.openDevTools({
+            mode: 'detach',
+            title: 'Main Window',
+            activate: true
+        });
+    }
 };
 
 // This method will be called when Electron has finished
