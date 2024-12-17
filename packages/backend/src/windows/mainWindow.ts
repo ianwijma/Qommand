@@ -4,7 +4,6 @@ import {BrowserWindow} from "electron";
 import {isDev} from "../utils/isDev";
 
 let window: BrowserWindow;
-
 export const mainWindow: WindowControls = {
     async initialize() {
         console.log('Initializing main window');
@@ -16,6 +15,7 @@ export const mainWindow: WindowControls = {
             minWidth: 1280,
             frame: false,
             autoHideMenuBar: true,
+            title: 'Qommand',
             webPreferences: {
                 preload: path.join(__dirname, '..', 'preload.js'),
             },
@@ -32,6 +32,8 @@ export const mainWindow: WindowControls = {
     async open() {
         console.log('Opening main window');
         window.show();
+
+        if (isDev()) this.openDevTools();
     },
     async close() {
         console.log('Closing main window');
@@ -53,7 +55,7 @@ export const mainWindow: WindowControls = {
         console.log('Opening dev tools');
         window.webContents.openDevTools({
             mode: 'detach',
-            title: 'Main Window',
+            title: 'Qommand Dev Tools',
             activate: true
         });
     }
