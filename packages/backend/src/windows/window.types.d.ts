@@ -3,6 +3,5 @@ export type WindowControls = {
     open: () => Promise<void>;
     close: () => Promise<void>;
     minimize: () => Promise<void>;
-    maximize: () => Promise<void>;
     openDevTools: () => Promise<void>;
 }

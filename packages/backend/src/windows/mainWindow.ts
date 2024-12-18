@@ -32,7 +32,7 @@ export const mainWindow: WindowControls & { [key: string]: () => void | Promise<
             }
         });
     },
-    async initializePage() {
+    async loadWindow() {
         if (isDev()) {
             await window.loadURL('http://localhost:3000/qommand');
         } else {
@@ -41,7 +41,7 @@ export const mainWindow: WindowControls & { [key: string]: () => void | Promise<
         }
     },
     async open() {
-        await this.initializePage();
+        await this.loadWindow();
 
         console.log('Opening main window');
         window.show();
@@ -53,14 +53,6 @@ export const mainWindow: WindowControls & { [key: string]: () => void | Promise<
         window.hide();
 
         if (isDev()) this.closeDevTools();
-    },
-    async maximize() {
-        console.log('Maximizing main window');
-        window.maximize();
-    },
-    async unmaximize() {
-        console.log('unmaximize main window');
-        window.unmaximize();
     },
     async minimize() {
         console.log('Minimizing main window');
