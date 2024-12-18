@@ -18,7 +18,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Qommand",
+    title: {
+        template: '%s | Qommand',
+        default: 'Qommand', // a default is required when creating a template
+    },
     description: "Qommand & Qonquer",
 };
 

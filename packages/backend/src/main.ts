@@ -1,6 +1,7 @@
-import {app, nativeImage, BrowserWindow, Menu, Tray} from 'electron';
+import {app, nativeImage, Menu, Tray} from 'electron';
 import started from 'electron-squirrel-startup';
 import {mainWindow} from "./windows/mainWindow";
+import {settingsWindow} from "./windows/settingsWindow";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -18,12 +19,18 @@ const setupSystemTray = () => {
             type: 'normal',
             click: () => mainWindow.open()
         },
+        {
+            label: 'Settings',
+            type: 'normal',
+            click: () => settingsWindow.open()
+        },
     ]);
     tray.setContextMenu(contextMenu);
 }
 
 const onReady = async () => {
     await mainWindow.initialize()
+    await settingsWindow.initialize()
     setupSystemTray();
 }
 

@@ -4,9 +4,9 @@ import {BrowserWindow} from "electron";
 import {isDev} from "../utils/isDev";
 
 let window: BrowserWindow;
-export const mainWindow: WindowControls & { [key: string]: () => void | Promise<void> } = {
+export const settingsWindow: WindowControls & { [key: string]: () => void | Promise<void> } = {
     async initialize() {
-        console.log('Initializing main window');
+        console.log('Initializing settings window');
         window = new BrowserWindow({
             show: false,
             width: 1080,
@@ -15,7 +15,7 @@ export const mainWindow: WindowControls & { [key: string]: () => void | Promise<
             minHeight: 700,
             frame: false,
             autoHideMenuBar: true,
-            title: 'Qommand',
+            title: 'Qommand Settings',
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js'),
             },
@@ -34,7 +34,7 @@ export const mainWindow: WindowControls & { [key: string]: () => void | Promise<
     },
     async loadWindow() {
         if (isDev()) {
-            await window.loadURL('http://localhost:3000/qommand');
+            await window.loadURL('http://localhost:3000/settings');
         } else {
             // TODO: Update when compiling
             await window.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
@@ -53,20 +53,20 @@ export const mainWindow: WindowControls & { [key: string]: () => void | Promise<
         }
     },
     async close() {
-        console.log('Closing main window');
+        console.log('Closing Settings window');
         window.hide();
 
         if (isDev()) this.closeDevTools();
     },
     async minimize() {
-        console.log('Minimizing main window');
+        console.log('Minimizing Settings window');
         window.minimize();
     },
     async openDevTools() {
         console.log('Opening dev tools');
         window.webContents.openDevTools({
             mode: 'detach',
-            title: 'Qommand Dev Tools',
+            title: 'Settings Dev Tools',
             activate: true
         });
     },
