@@ -2,6 +2,11 @@ import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 
+import {config} from '@fortawesome/fontawesome-svg-core'
+import '@fortawesome/fontawesome-svg-core/styles.css'
+
+config.autoAddCss = false
+
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
@@ -27,13 +32,7 @@ export default function RootLayout({
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-        <div id='title-bar' className='w-screen h-12 bg-gray-900'>
-            border
-            <button className='no-drag'>click</button>
-        </div>
-        <div className={'w-screen h-fit overflow-hidden'}>
-            {children}
-        </div>
+        {children}
         </body>
         </html>
     );

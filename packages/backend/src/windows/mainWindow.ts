@@ -1,35 +1,48 @@
 import {WindowControls} from "./window.types";
 import path from "path";
-import {BrowserWindow} from "electron";
+import {BrowserWindow, ipcMain} from "electron";
 import {isDev} from "../utils/isDev";
 
 let window: BrowserWindow;
-export const mainWindow: WindowControls = {
+export const mainWindow: WindowControls & { [key: string]: () => void | Promise<void> } = {
     async initialize() {
         console.log('Initializing main window');
         window = new BrowserWindow({
             show: false,
-            width: 1280,
-            height: 800,
-            minHeight: 800,
-            minWidth: 1280,
+            width: 1080,
+            height: 700,
+            minWidth: 1080,
+            minHeight: 700,
             frame: false,
             autoHideMenuBar: true,
             title: 'Qommand',
             webPreferences: {
-                preload: path.join(__dirname, '..', 'preload.js'),
+                preload: path.join(__dirname, 'preload.js'),
             },
         });
 
-        // and load the index.html of the app.
+        window.webContents.on('ipc-message', (_, action) => {
+            switch (action) {
+                case 'close':
+                    this.close();
+                    break;
+                case 'minimize':
+                    this.minimize();
+                    break;
+            }
+        });
+    },
+    async initializePage() {
         if (isDev()) {
-            await window.loadURL('http://localhost:3000');
+            await window.loadURL('http://localhost:3000/qommand');
         } else {
-            // TODO: Update
+            // TODO: Update when compiling
             await window.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
         }
     },
     async open() {
+        await this.initializePage();
+
         console.log('Opening main window');
         window.show();
 
@@ -38,14 +51,16 @@ export const mainWindow: WindowControls = {
     async close() {
         console.log('Closing main window');
         window.hide();
-    },
-    async fullscreen() {
-        console.log('Fullscreen main window');
-        window.isFullScreen() ? window.setFullScreen(false) : window.setFullScreen(true);
+
+        if (isDev()) this.closeDevTools();
     },
     async maximize() {
         console.log('Maximizing main window');
         window.maximize();
+    },
+    async unmaximize() {
+        console.log('unmaximize main window');
+        window.unmaximize();
     },
     async minimize() {
         console.log('Minimizing main window');
@@ -58,5 +73,9 @@ export const mainWindow: WindowControls = {
             title: 'Qommand Dev Tools',
             activate: true
         });
+    },
+    async closeDevTools() {
+        console.log('closing dev tools');
+        window.webContents.closeDevTools();
     }
 };
