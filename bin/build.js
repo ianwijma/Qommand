@@ -1,6 +1,6 @@
 import 'zx/globals'
 
-// Cleanup
+echo`~~~ Cleaning up previous build files...`
 await Promise.allSettled([
     $`rm -r packages/backend/.vite`,
     $`rm -r packages/backend/out`,
@@ -8,16 +8,17 @@ await Promise.allSettled([
     $`rm -r packages/frontend/out`,
 ])
 
-// Build frontend and prepare backend
+echo`~~~ Build frontend and prepare backend...`
 await Promise.all([
     $`npm run build --workspace=packages/frontend`,
     $`npm run package --workspace=packages/backend`
 ])
 
-// Clean backend renderer build folder
+echo`~~~ Clean backend renderer build folder...`
 await $`rm -r packages/backend/.vite/renderer/the_window/*`;
 
-// copy compiled frontend packages into the backend renderer build folder
+echo`~~~ Copy compiled frontend packages into the backend renderer build folder...`
 await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
 
+echo`~~~ Build backend...`
 await $`npm run make --workspace=packages/backend`
