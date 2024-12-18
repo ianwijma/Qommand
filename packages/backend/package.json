@@ -1,8 +1,8 @@
 {
-  "name": "backend",
-  "productName": "backend",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "name": "qommand",
+  "productName": "Qommand",
+  "version": "0.0.1",
+  "description": "Qommand & Qonquer",
   "main": ".vite/build/main.js",
   "scripts": {
     "dev": "nodemon",

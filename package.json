@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "node bin/dev.js"
+    "dev": "node bin/dev.js",
+    "build": "node bin/build.js"
   },
   "author": "Ian Wijma (https://ian.wij.ma/)",
   "license": "",
@@ -14,6 +15,7 @@
     "packages/backend"
   ],
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "zx": "^8.2.4"
   }
 }
