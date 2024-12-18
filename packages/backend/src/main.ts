@@ -15,14 +15,22 @@ const setupSystemTray = () => {
 
     const contextMenu = Menu.buildFromTemplate([
         {
-            label: 'Qommand',
+            label: 'Open Qommand',
             type: 'normal',
             click: () => mainWindow.open()
         },
         {
-            label: 'Settings',
+            label: 'Open Settings',
             type: 'normal',
             click: () => settingsWindow.open()
+        },
+        {
+            type: 'separator',
+        },
+        {
+            label: 'Quit Qommand',
+            type: 'normal',
+            click: () => app.quit()
         },
     ]);
     tray.setContextMenu(contextMenu);

@@ -1,1 +1,1 @@
-export const isDev = () => typeof MAIN_WINDOW_VITE_DEV_SERVER_URL === "string";
+export const isDev = () => process.env.APP_ENV === 'dev';
