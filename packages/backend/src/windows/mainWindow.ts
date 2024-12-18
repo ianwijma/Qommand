@@ -1,6 +1,6 @@
 import {WindowControls} from "./window.types";
 import path from "path";
-import {BrowserWindow, ipcMain} from "electron";
+import {BrowserWindow} from "electron";
 import {isDev} from "../utils/isDev";
 
 let window: BrowserWindow;
