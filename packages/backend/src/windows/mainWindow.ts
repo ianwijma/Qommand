@@ -36,8 +36,7 @@ export const mainWindow: WindowControls & { [key: string]: () => void | Promise<
         if (isDev()) {
             await window.loadURL('http://localhost:3000/qommand');
         } else {
-            // TODO: Update when compiling
-            await window.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+            await window.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/qommand.html`));
         }
     },
     async open() {

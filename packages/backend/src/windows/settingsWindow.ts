@@ -36,8 +36,7 @@ export const settingsWindow: WindowControls & { [key: string]: () => void | Prom
         if (isDev()) {
             await window.loadURL('http://localhost:3000/settings');
         } else {
-            // TODO: Update when compiling
-            await window.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+            await window.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/settings.html`));
         }
     },
     async open() {
