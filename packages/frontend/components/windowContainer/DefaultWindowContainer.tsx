@@ -8,7 +8,7 @@ type DefaultWindowContainerProps = PropsWithChildren & {
 export const DefaultWindowContainer = ({children, title}: DefaultWindowContainerProps) => {
     return <div className='w-screen h-screen flex flex-col overflow-hidden'>
         <TitleBar>Qommand</TitleBar>
-        <div className='flex flex-col bg-slate-700 h-full py-1 px-1'>
+        <div className='flex flex-col bg-slate-700 h-full py-1 px-1 overflow-x-auto'>
             {children}
         </div>
     </div>
