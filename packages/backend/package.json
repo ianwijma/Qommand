@@ -1,6 +1,6 @@
 {
   "name": "qommand",
-  "productName": "Qommand",
+  "productName": "qommand",
   "version": "0.0.1",
   "description": "Qommand & Qonquer",
   "main": ".vite/build/main.js",

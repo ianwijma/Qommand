@@ -1,10 +1,7 @@
-import {$, cd} from 'zx';
+import 'zx/globals'
 
-// Go To Root
-cd('..');
-
-// TODO: Cleanup
-await Promise.all([
+// Cleanup
+await Promise.allSettled([
     $`rm -r packages/backend/.vite`,
     $`rm -r packages/backend/out`,
     $`rm -r packages/frontend/.next`,
@@ -18,9 +15,9 @@ await Promise.all([
 ])
 
 // Clean backend renderer build folder
-await $`rm -r packages/backend/.vite/the_window/*`;
+await $`rm -r packages/backend/.vite/renderer/the_window/*`;
 
 // copy compiled frontend packages into the backend renderer build folder
-await $`cp packages/frontend/out/* packages/backend/.vite/the_window/`;
+await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
 
 await $`npm run make --workspace=packages/backend`
