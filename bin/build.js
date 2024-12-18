@@ -11,6 +11,7 @@ await Promise.allSettled([
 echo`~~~ Build frontend and prepare backend...`
 await Promise.all([
     $`npm run build --workspace=packages/frontend`,
+    // TODO: Not needed
     $`npm run package --workspace=packages/backend`
 ])
 
@@ -21,4 +22,5 @@ echo`~~~ Copy compiled frontend packages into the backend renderer build folder.
 await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
 
 echo`~~~ Build backend...`
+// TODO: This rebuilds the app & the previous copy is no where to be found.
 await $`npm run make --workspace=packages/backend`
