@@ -40,13 +40,6 @@ export const mainWindow: WindowType & { loadWindow: () => Promise<void> } = {
             50: () => console.log('middle'),
             0: () => console.log('first')
         })
-
-        // Another subscription for the same events.
-        subscribe(ButtonClickedEvent, {
-            100: () => console.log('laatste'),
-            0: () => console.log('eerste'),
-            50: () => console.log('middelste')
-        })
     },
     async loadWindow() {
         if (isDev()) {
