@@ -1,10 +1,12 @@
-import {WindowControls} from "./window.types";
+import {WindowType} from "./window.type";
 import path from "path";
 import {BrowserWindow} from "electron";
 import {isDev} from "../utils/isDev";
+import {subscribe} from "../eventSubscriptions/subscriptionHandler";
+import {ButtonClickedEvent} from "../eventSubscriptions/events/buttonClicked.event";
 
 let window: BrowserWindow;
-export const mainWindow: WindowControls & { [key: string]: () => void | Promise<void> } = {
+export const mainWindow: WindowType & { loadWindow: () => Promise<void> } = {
     async initialize() {
         console.log('Initializing main window');
         window = new BrowserWindow({
@@ -31,6 +33,20 @@ export const mainWindow: WindowControls & { [key: string]: () => void | Promise<
                     break;
             }
         });
+
+        subscribe(ButtonClickedEvent, {
+            200: () => window.webContents.send('clicked'),
+            100: () => console.log('last'),
+            50: () => console.log('middle'),
+            0: () => console.log('first')
+        })
+
+        // Another subscription for the same events.
+        subscribe(ButtonClickedEvent, {
+            100: () => console.log('laatste'),
+            0: () => console.log('eerste'),
+            50: () => console.log('middelste')
+        })
     },
     async loadWindow() {
         if (isDev()) {

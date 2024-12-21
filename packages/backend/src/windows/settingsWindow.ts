@@ -1,10 +1,12 @@
-import {WindowControls} from "./window.types";
+import {WindowType} from "./window.type";
 import path from "path";
 import {BrowserWindow} from "electron";
 import {isDev} from "../utils/isDev";
+import {ButtonClickedEvent} from "../eventSubscriptions/events/buttonClicked.event";
+import {emitEvent} from "../eventSubscriptions/subscriptionHandler";
 
 let window: BrowserWindow;
-export const settingsWindow: WindowControls & { [key: string]: () => void | Promise<void> } = {
+export const settingsWindow: WindowType & { loadWindow: () => Promise<void> } = {
     async initialize() {
         console.log('Initializing settings window');
         window = new BrowserWindow({
@@ -28,6 +30,9 @@ export const settingsWindow: WindowControls & { [key: string]: () => void | Prom
                     break;
                 case 'minimize':
                     this.minimize();
+                    break;
+                case 'click':
+                    emitEvent(ButtonClickedEvent)
                     break;
             }
         });
