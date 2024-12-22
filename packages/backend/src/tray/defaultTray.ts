@@ -1,6 +1,7 @@
 import {app, Menu, nativeImage, Tray} from "electron";
 import {mainWindow} from "../windows/mainWindow";
 import {settingsWindow} from "../windows/settingsWindow";
+import {taskWindow} from "../windows/taskWindow";
 
 export const defaultTray = {
     async initialize() {
@@ -10,6 +11,11 @@ export const defaultTray = {
         tray.setToolTip('Qommand');
 
         const contextMenu = Menu.buildFromTemplate([
+            {
+                label: 'Open Qommand Tasks',
+                type: 'normal',
+                click: () => taskWindow.open()
+            },
             {
                 label: 'Open Qommand',
                 type: 'normal',

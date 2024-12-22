@@ -6,7 +6,7 @@ import {
     addEmitEventHandler,
     emitEventWithDefaultHandler, getEventByName
 } from "@qommand/common/src/eventSubscriptions";
-import {EventName} from "@qommand/common/src/types";
+import {EventName} from "@qommand/common/src/events.types";
 
 /**
  * This file is generically shared with all windows for now.

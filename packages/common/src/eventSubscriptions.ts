@@ -1,5 +1,5 @@
 import {sortByKey} from "./object";
-import {EventName, EventType} from "./types";
+import {EventName, EventType} from "./events.types";
 import * as events from "./events";
 
 export type Subscriptions<T extends EventType> = {

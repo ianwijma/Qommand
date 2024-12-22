@@ -1,4 +1,3 @@
-import {WindowType} from "./window.type";
 import {BrowserWindow} from "electron";
 import path from "path";
 import {addEmitEventHandler, emitEvent, getEventByName} from '@qommand/common/src/eventSubscriptions'
@@ -9,14 +8,26 @@ export type CreateWindowParams = {
     route: string,
 }
 
-export type CreateWindowReturn = WindowType & {
-    genericInitializeWindow: () => Promise<void>;
+export type CreateWindowReturn = {
+    initialize: () => Promise<void>;
+    open: () => Promise<void>;
+    close: () => Promise<void>;
+    minimize: () => Promise<void>;
+    openDevTools: () => Promise<void>;
+    closeDevTools: () => Promise<void>;
 };
 
 export const createWindow = ({title, route}: CreateWindowParams): CreateWindowReturn => {
     let window: BrowserWindow;
+    let loadWindowPromise: Promise<void>;
+
+    const isInitialized = () => {
+        if (!window) throw new Error("Window was not initialized");
+    }
 
     const openDevTools = async () => {
+        isInitialized();
+
         window.webContents.openDevTools({
             mode: 'detach',
             title: `${title} Dev Tools`,
@@ -24,17 +35,28 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         });
     }
     const closeDevTools = async () => {
+        isInitialized();
+
         window.webContents.closeDevTools();
     }
     const close = async () => {
+        isInitialized();
+
         window.hide();
 
         if (isDev()) closeDevTools();
+
+        // Reset the window content.
+        loadWindowPromise = loadWindow();
     }
     const minimize = async () => {
+        isInitialized();
+
         window.minimize();
     }
     const loadWindow = async () => {
+        isInitialized();
+
         if (isDev()) {
             await window.loadURL(`http://localhost:3000/${route}`);
         } else {
@@ -43,10 +65,12 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         }
     }
     const open = async () => {
+        isInitialized();
+
         if (window.isVisible()) {
             window.show()
         } else {
-            await loadWindow();
+            await loadWindowPromise;
 
             window.show();
 
@@ -54,7 +78,7 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         }
     }
 
-    const genericInitializeWindow = async () => {
+    const initialize = async () => {
         console.log(`Initializing ${title} window`);
 
         window = new BrowserWindow({
@@ -70,6 +94,8 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
                 preload: path.join(__dirname, 'preload.js'),
             },
         })
+
+        loadWindowPromise = loadWindow();
 
         window.webContents.on('ipc-message', (_, action, ...params) => {
             switch (action) {
@@ -92,12 +118,7 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         })
     }
 
-    const initialize = async () => {
-        genericInitializeWindow();
-    }
-
     return {
-        genericInitializeWindow,
         initialize,
         open,
         close,

@@ -1,5 +1,5 @@
 import {isClient} from "../utils/isClient";
-import {EventType} from "@qommand/common/src/types";
+import {EventType} from "@qommand/common/src/events.types";
 import {Subscriptions} from "@qommand/common/src/eventSubscriptions";
 
 export const useEventSubscriptions = () => {
