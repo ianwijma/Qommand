@@ -1,6 +1,5 @@
 {
   "name": "@qommand/common",
-  "main": "src/index.ts",
   "scripts": {},
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

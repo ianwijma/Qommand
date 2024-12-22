@@ -1,4 +1,4 @@
-import {DefaultWindowContainer} from "@/components/windowContainer/DefaultWindowContainer";
+import {DefaultWindowContainer} from "../../components/windowContainer/DefaultWindowContainer";
 import {Metadata} from "next";
 import {Button} from "./button";
 

@@ -2,11 +2,17 @@ import {WindowType} from "./window.type";
 import path from "path";
 import {BrowserWindow} from "electron";
 import {isDev} from "../utils/isDev";
-import {ButtonClickedEvent} from "../eventSubscriptions/events/buttonClicked.event";
-import {emitEvent} from "../eventSubscriptions/subscriptionHandler";
+import {ButtonClickedEvent} from "@qommand/common/src/events/buttonClicked.event";
+import {emitEvent} from "@qommand/common/src/eventSubscriptions";
+import {createWindow} from "./createWindow";
+
+export const settingsWindow = createWindow({
+    title: 'Qommand Settings',
+    route: 'settings'
+});
 
 let window: BrowserWindow;
-export const settingsWindow: WindowType & { loadWindow: () => Promise<void> } = {
+export const settingsWindowOld: WindowType & { loadWindow: () => Promise<void> } = {
     async initialize() {
         console.log('Initializing settings window');
         window = new BrowserWindow({

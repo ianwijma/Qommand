@@ -1,4 +1,4 @@
-import {useWindowControls} from "@/hooks/useWindowControls";
+import {useWindowControls} from "../../hooks/useWindowControls";
 import {PropsWithChildren} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faWindowMinimize, faXmark} from "@fortawesome/free-solid-svg-icons";

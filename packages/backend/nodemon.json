@@ -1,6 +1,7 @@
 {
   "watch": [
-    "src/"
+    "src/",
+    "../common/src"
   ],
   "ext": "ts",
   "delay": "500",

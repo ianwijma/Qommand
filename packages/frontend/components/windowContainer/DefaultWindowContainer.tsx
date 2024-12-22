@@ -1,7 +1,7 @@
 "use client";
 
 import {PropsWithChildren} from "react";
-import {TitleBar} from "@/components/window/TitleBar";
+import {TitleBar} from "../window/TitleBar";
 import Head from "next/head";
 
 type DefaultWindowContainerProps = PropsWithChildren & {

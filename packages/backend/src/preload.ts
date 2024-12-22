@@ -1,20 +1,34 @@
-// See the Electron documentation for details on how to use preload scripts:
-// https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
+const {contextBridge, ipcRenderer} = require('electron/renderer'); // Needs to be require for some reason?
 
-import type {IpcRendererEvent} from 'electron';
+import {
+    emitEvent,
+    subscribe,
+    addEmitEventHandler,
+    emitEventWithDefaultHandler, getEventByName
+} from "@qommand/common/src/eventSubscriptions";
+import {EventName} from "@qommand/common/src/types";
 
 /**
  * This file is generically shared with all windows for now.
- * It needs to be refactored, but it's OK for now...
  */
 
-const {contextBridge, ipcRenderer} = require('electron/renderer')
 
-console.log('preload.ts loaded')
+addEmitEventHandler((event) => {
+    ipcRenderer.send('event-subscription-to-main', event.name)
+})
+
+ipcRenderer.on('event-subscription-to-renderer', (_, eventName: EventName) => {
+    const event = getEventByName(eventName);
+
+    emitEventWithDefaultHandler(event);
+})
 
 contextBridge.exposeInMainWorld('windowApi', {
     close: () => ipcRenderer.send('close'),
     minimize: () => ipcRenderer.send('minimize'),
-    click: () => ipcRenderer.send('click'),
-    onClick: (callback: () => void) => ipcRenderer.on('clicked', () => callback()),
+})
+
+contextBridge.exposeInMainWorld('eventSubscriptionApi', {
+    emitEvent,
+    subscribe,
 })

@@ -7,9 +7,11 @@
     "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
+    "isolatedModules": true,
     "baseUrl": ".",
     "outDir": "dist",
     "moduleResolution": "node",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "incremental": true
   }
 }

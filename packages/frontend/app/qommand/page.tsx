@@ -1,5 +1,5 @@
-import {DefaultWindowContainer} from "@/components/windowContainer/DefaultWindowContainer";
-import {Listen} from "@/app/qommand/listen";
+import {DefaultWindowContainer} from "../../components/windowContainer/DefaultWindowContainer";
+import {Listen} from "./listen";
 
 
 export default function QommandPage() {
