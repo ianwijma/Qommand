@@ -3,10 +3,13 @@ import {BaseSettings} from "@qommand/common/src/settings.types";
 
 type CreateSettingParams<T> = {
     name: string;
-    defaultSettings: T
+    defaultSettings: Omit<T, "name">;
 }
 
-type CreateSettingReturn<T> = {
+export type SettingsName = string;
+
+export type CreateSettingReturn<T> = {
+    name: SettingsName;
     initialize: () => Promise<void>;
     getSettings: () => T;
     syncSettings: () => Promise<void>;
@@ -18,6 +21,7 @@ export const createSettings = <T extends BaseSettings>({
                                                            name,
                                                            defaultSettings
                                                        }: CreateSettingParams<T>): CreateSettingReturn<T> => {
+    const actuallyDefaultSettings: T = {...defaultSettings, name} as T;
     const settingsFilePath = `settings/${name}.yaml`;
     let settingsCache: T;
 
@@ -40,7 +44,7 @@ export const createSettings = <T extends BaseSettings>({
     const syncSettings = async () => {
         const settingsFileExists = await fileExists(settingsFilePath);
         if (!settingsFileExists) {
-            await writeYamlFile<T>(settingsFilePath, defaultSettings);
+            await writeYamlFile<T>(settingsFilePath, actuallyDefaultSettings);
         }
 
         settingsCache = await readYamlFile<T>(settingsFilePath);
@@ -55,7 +59,7 @@ export const createSettings = <T extends BaseSettings>({
     }
 
     const resetSettings = async () => {
-        await writeYamlFile<T>(settingsFilePath, defaultSettings);
+        await writeYamlFile<T>(settingsFilePath, actuallyDefaultSettings);
 
         await syncSettings();
 
@@ -63,6 +67,7 @@ export const createSettings = <T extends BaseSettings>({
     }
 
     return {
+        name,
         initialize,
         getSettings,
         syncSettings,
