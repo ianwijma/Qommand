@@ -18,8 +18,7 @@ const {result} = concurrently(
     ],
     {
         prefix: 'name',
-        killOthers: [],
-        // restartTries: 3,
+        killOthers: ['failure'],
     },
 );
 result.then(console.log, console.error);

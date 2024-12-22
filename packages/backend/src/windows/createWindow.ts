@@ -2,6 +2,7 @@ import {BrowserWindow} from "electron";
 import path from "path";
 import {addEmitEventHandler, emitEvent, getEventByName} from '@qommand/common/src/eventSubscriptions'
 import {isDev} from "../utils/isDev";
+import {startupArguments} from "../utils/startupArguments";
 
 export type CreateWindowParams = {
     title: string,
@@ -44,7 +45,7 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
 
         window.hide();
 
-        if (isDev()) closeDevTools();
+        if (isDev() || 'dev' in startupArguments) closeDevTools();
 
         // Reset the window content.
         loadWindowPromise = loadWindow();
@@ -61,7 +62,7 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
             await window.loadURL(`http://localhost:3000/${route}`);
         } else {
             // TODO: Make work
-            await window.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/${route}.html`));
+            await window.loadFile(path.join(__dirname, `../renderer/the_window/${route}.html`));
         }
     }
     const open = async () => {
@@ -74,7 +75,7 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
 
             window.show();
 
-            if (isDev()) openDevTools();
+            if (isDev() || 'dev' in startupArguments) openDevTools();
         }
     }
 

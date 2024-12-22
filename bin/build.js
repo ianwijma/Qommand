@@ -8,19 +8,20 @@ await Promise.allSettled([
     $`rm -r packages/frontend/out`,
 ])
 
-echo`~~~ Build frontend and prepare backend...`
-await Promise.all([
-    $`npm run build --workspace=packages/frontend`,
-    // TODO: Not needed
-    $`npm run package --workspace=packages/backend`
-])
+echo`~~~ Build frontend...`
+await $`npm run build --workspace=packages/frontend`
 
-echo`~~~ Clean backend renderer build folder...`
-await $`rm -r packages/backend/.vite/renderer/the_window/*`;
-
-echo`~~~ Copy compiled frontend packages into the backend renderer build folder...`
-await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
 
 echo`~~~ Build backend...`
-// TODO: This rebuilds the app & the previous copy is no where to be found.
-await $`npm run make --workspace=packages/backend`
+const buildPromise = $`npm run make --workspace=packages/backend`;
+
+// IMPORTANT:
+//      LOL, wait for the build process to have created the .vite folder structure. so we can copy over the NextJS files...
+await sleep('2s');
+
+echo`~~~ Copy compiled frontend packages into the backend renderer build folder...`
+await $`mkdir -p packages/backend/.vite/renderer/the_window/`
+await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
+
+await buildPromise;
+

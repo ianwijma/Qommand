@@ -41,7 +41,9 @@
   "dependencies": {
     "@qommand/common": "*",
     "@types/electron-squirrel-startup": "^1.0.2",
+    "@types/yargs-parser": "^21.0.3",
     "electron-squirrel-startup": "^1.0.1",
-    "yaml": "^2.6.1"
+    "yaml": "^2.6.1",
+    "yargs-parser": "^21.1.1"
   }
 }

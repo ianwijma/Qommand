@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import {DefaultWindowContainer} from "@/components/windowContainer/DefaultWindowContainer";
+import {DefaultWindowContainer} from "../components/windowContainer/DefaultWindowContainer";
 
 export default function Home() {
     return (

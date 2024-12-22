@@ -32,3 +32,10 @@ contextBridge.exposeInMainWorld('eventSubscriptionApi', {
     emitEvent,
     subscribe,
 })
+
+contextBridge.exposeInMainWorld('settingsApi', {
+    updateSettings: <T>(updatedSettings: T) => ipcRenderer.send('updateSettings', updatedSettings),
+    subscribe,
+})
+
+
