@@ -1,9 +1,9 @@
 import {sortByKey} from "./object";
 import {EventName, EventType} from "./events.types";
-import * as events from "./events";
+import {eventByName} from "./events/eventsByName";
 
 export type Subscriptions<T extends EventType> = {
-    [key: number]: (event: T) => void;
+    [key: number]: (event: T, ...args: any[]) => void;
 }
 
 type Registry = {
@@ -24,42 +24,34 @@ export const subscribe = <T extends EventType>(event: EventType, subscriptions: 
     registry[event.name].push(sortedSubscriptions);
 }
 
-export type EmitEventHandler = (event: EventType) => void
+export type EmitEventHandler = (event: EventType, ...args: any[]) => void
 
-const defaultEventHandler: EmitEventHandler = (event: EventType) => {
+const defaultEventHandler: EmitEventHandler = (event: EventType, ...args: any[]) => {
     const {name} = event;
 
     const eventSubscriptions = registry[name] ?? [];
 
     eventSubscriptions.forEach((subscriptions) => {
         Object.values(subscriptions).forEach((subscription) => {
-            subscription(event);
+            subscription(event, ...args);
         })
     })
 }
 
 const emitEventHandlers: EmitEventHandler[] = [defaultEventHandler]
 
-export const emitEvent = (event: EventType) => {
-    emitEventHandlers.forEach((emitEventHandler) => emitEventHandler(event))
+export const emitEvent = (event: EventType, ...args: any[]) => {
+    emitEventHandlers.forEach((emitEventHandler) => emitEventHandler(event, ...args))
 }
 
 // This function can be useful for prevents an event loop, caused by additional emitEventHandlers.
-export const emitEventWithDefaultHandler = (event: EventType) => {
-    defaultEventHandler(event);
+export const emitEventWithDefaultHandler = (event: EventType, ...args: any[]) => {
+    defaultEventHandler(event, ...args);
 }
 
-type EventByNameMap = { [name: EventName]: EventType }
-
-const eventByNameMap: EventByNameMap = Object.values(events).reduce<EventByNameMap>((map, event) => {
-    map[event.name] = event;
-
-    return map;
-}, {})
-
 export const getEventByName = (name: EventName): EventType => {
-    if (name in eventByNameMap) {
-        return eventByNameMap[name];
+    if (name in eventByName) {
+        return eventByName[name];
     } else {
         throw new Error(`Event with ${name} does not exist, did not miss to add it to the events/index.ts file?`);
     }

@@ -10,9 +10,7 @@
   "license": "",
   "description": "Running Commands",
   "workspaces": [
-    "packages/common",
-    "packages/frontend",
-    "packages/backend"
+    "packages/*"
   ],
   "devDependencies": {
     "concurrently": "^9.1.0",

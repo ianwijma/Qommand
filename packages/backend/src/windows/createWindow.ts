@@ -3,17 +3,7 @@ import path from "path";
 import {addEmitEventHandler, emitEvent, getEventByName} from '@qommand/common/src/eventSubscriptions'
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
-import * as settings from "../settings";
-import {CreateSettingReturn} from "../settings/createSettings";
-import {BaseSettings} from "@qommand/common/src/settings.types";
-
-type SettingsByNameMap = { [name: string]: CreateSettingReturn<BaseSettings> }
-
-const settingsByNameMap: SettingsByNameMap = Object.values(settings).reduce<SettingsByNameMap>((map, settings) => {
-    map[settings.name] = settings;
-
-    return map;
-}, {})
+import {settingsByName} from "../settings/settingsByName";
 
 export type CreateWindowParams = {
     title: string,
@@ -90,6 +80,45 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         }
     }
 
+    const initializeEventListeners = () => {
+        isInitialized();
+
+        window.webContents.on('ipc-message', async (_, action, ...params) => {
+            switch (action) {
+                case 'close': {
+                    close();
+                }
+                    break;
+                case 'minimize': {
+                    minimize();
+                }
+                    break;
+                case 'event-subscription-to-main': {
+                    const [eventName, eventData] = params;
+                    const event = getEventByName(eventName);
+                    emitEvent(event, eventData);
+                }
+                    break;
+                case 'submit-setting-update': {
+                    const [settingToUpdate] = params;
+                    const {name} = settingToUpdate;
+                    const settings = settingsByName[name];
+                    await settings.updateSettings(settingToUpdate);
+                }
+                    break;
+                case 'request-settings': {
+                    const [settingName] = params;
+                    const settings = settingsByName[settingName];
+                    window.webContents.send('request-settings-response', settings.name, settings.getSettings());
+                }
+            }
+        });
+
+        addEmitEventHandler((event, ...args) => {
+            window.webContents.send('event-subscription-to-renderer', event.name, ...args);
+        });
+    }
+
     const initialize = async () => {
         console.log(`Initializing ${title} window`);
 
@@ -109,31 +138,7 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
 
         loadWindowPromise = loadWindow();
 
-        window.webContents.on('ipc-message', (_, action, ...params) => {
-            switch (action) {
-                case 'close':
-                    close();
-                    break;
-                case 'minimize':
-                    minimize();
-                    break;
-                case 'event-subscription-to-main':
-                    const [eventName] = params;
-                    const event = getEventByName(eventName);
-                    emitEvent(event);
-                    break;
-                case 'submit-setting-update':
-                    const [updatedSettings] = params;
-                    const {name} = updatedSettings;
-                    const settings = settingsByNameMap[name];
-                    settings.updateSettings(updatedSettings);
-                    break;
-            }
-        });
-
-        addEmitEventHandler((event) => {
-            window.webContents.send('event-subscription-to-renderer', event.name);
-        })
+        initializeEventListeners();
     }
 
     return {

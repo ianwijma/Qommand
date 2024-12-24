@@ -1,12 +1,13 @@
 import {fileExists, readYamlFile, writeYamlFile} from "../utils/files";
 import {BaseSettings} from "@qommand/common/src/settings.types";
-
-type CreateSettingParams<T> = {
-    name: string;
-    defaultSettings: Omit<T, "name">;
-}
+import {emitSettingUpdatedEvent} from '@qommand/common/src/events/settingUpdated.event'
 
 export type SettingsName = string;
+
+type CreateSettingParams<T> = {
+    name: SettingsName;
+    defaultSettings: Omit<T, "name">;
+}
 
 export type CreateSettingReturn<T> = {
     name: SettingsName;
@@ -50,12 +51,16 @@ export const createSettings = <T extends BaseSettings>({
         settingsCache = await readYamlFile<T>(settingsFilePath);
     }
 
-    const updateSettings = async (updatedSettings: T): Promise<T> => {
-        await writeYamlFile<T>(settingsFilePath, updatedSettings);
+    const updateSettings = async (settingToUpdate: T): Promise<T> => {
+        await writeYamlFile<T>(settingsFilePath, settingToUpdate);
 
         await syncSettings();
 
-        return getSettings();
+        const updatedSetting = getSettings();
+
+        emitSettingUpdatedEvent(name, updatedSetting);
+
+        return updatedSetting;
     }
 
     const resetSettings = async () => {
@@ -63,7 +68,11 @@ export const createSettings = <T extends BaseSettings>({
 
         await syncSettings();
 
-        return getSettings();
+        const resetSettings = getSettings();
+
+        emitSettingUpdatedEvent(name, resetSettings);
+
+        return resetSettings;
     }
 
     return {
