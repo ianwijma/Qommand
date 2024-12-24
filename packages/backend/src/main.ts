@@ -15,19 +15,19 @@ if (started) {
 
 let isSingleInstance = app.requestSingleInstanceLock()
 if (!isSingleInstance) {
-    app.quit()
-}
+    app.quit();
+} else {
+    const onReady = async () => {
+        await tasksSettings.initialize();
+        await taskWindow.initialize();
+        await mainWindow.initialize();
+        await settingsWindow.initialize();
+        await defaultTray.initialize();
 
-const onReady = async () => {
-    await tasksSettings.initialize();
-    await taskWindow.initialize();
-    await mainWindow.initialize();
-    await settingsWindow.initialize();
-    await defaultTray.initialize();
-
-    if (isDev() || startupArguments.reset) {
-        await tasksSettings.resetSettings();
+        if (isDev() || startupArguments.reset) {
+            await tasksSettings.resetSettings();
+        }
     }
-}
 
-app.on('ready', onReady);
+    app.on('ready', onReady);
+}
