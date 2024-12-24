@@ -2,8 +2,10 @@ import path from 'path';
 import fs from 'fs/promises';
 import {homedir} from 'os';
 import YAML from 'yaml'
+import {isDev} from "./isDev";
 
-const ROOT_DIR = path.resolve(homedir(), '.config', 'qommand', '.files');
+const FILES_DIR = isDev() ? '.files-dev' : '.files';
+const ROOT_DIR = path.resolve(homedir(), '.config', 'qommand', FILES_DIR);
 
 const normalizeFilePath = (relativePath: string): string => {
     const resolvedPath = path.resolve(ROOT_DIR, relativePath);
