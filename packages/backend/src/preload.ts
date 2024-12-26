@@ -19,9 +19,8 @@ import {nanoid} from "nanoid";
  * This file is generically shared with all windows for now.
  */
 
-
-addEmitEventHandler((event, eventData) => {
-    ipcRenderer.send('event-subscription-to-main', event.name, eventData)
+addEmitEventHandler((event, ...args) => {
+    ipcRenderer.send('event-subscription-to-main', event.name, ...args);
 })
 
 ipcRenderer.on('event-subscription-to-renderer', (_, eventName: EventName, ...args: any[]) => {
@@ -61,7 +60,7 @@ type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A
 
 contextBridge.exposeInMainWorld('dialogApi', {
     open: async <T extends keyof Dialog>(dialogName: T, ...dialogOptions: ArgumentTypes<Dialog[T]>) => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const id = nanoid();
 
             ipcRenderer.on('open-dialog-response', (_, responseId, results) => {
@@ -72,6 +71,7 @@ contextBridge.exposeInMainWorld('dialogApi', {
 
             ipcRenderer.send('open-dialog', id, dialogName, ...dialogOptions);
         })
-    }
+    },
+
 })
 

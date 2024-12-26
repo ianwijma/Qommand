@@ -17,6 +17,7 @@ type PropDrillParams = LevelParams & OnClickParams
 type FoldersParams = PropDrillParams & { subFolders: SubFolders };
 
 const createFolder = async (subFolders: SubFolders) => {
+    // @ts-ignore
     const name: FolderName = await window.dialogApi.open('showMessageBox', {
         title: 'Give folder name',
     });

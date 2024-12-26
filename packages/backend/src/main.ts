@@ -1,9 +1,9 @@
 import {app} from 'electron';
 import started from 'electron-squirrel-startup';
-import {mainWindow} from "./windows/mainWindow";
-import {settingsWindow} from "./windows/settingsWindow";
+import {mainWindow} from "./windows/main.window";
+import {settingsWindow} from "./windows/settings.window";
 import {defaultTray} from "./tray/defaultTray";
-import {taskWindow} from "./windows/taskWindow";
+import {taskWindow} from "./windows/task.window";
 import {taskFolderSettings, tasksSettings} from "./settings";
 import {startupArguments} from "./utils/startupArguments";
 import {isDev} from "./utils/isDev";

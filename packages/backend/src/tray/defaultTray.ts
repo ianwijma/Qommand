@@ -1,7 +1,7 @@
 import {app, Menu, nativeImage, Tray} from "electron";
-import {mainWindow} from "../windows/mainWindow";
-import {settingsWindow} from "../windows/settingsWindow";
-import {taskWindow} from "../windows/taskWindow";
+import {mainWindow} from "../windows/main.window";
+import {settingsWindow} from "../windows/settings.window";
+import {taskWindow} from "../windows/task.window";
 
 export const defaultTray = {
     async initialize() {

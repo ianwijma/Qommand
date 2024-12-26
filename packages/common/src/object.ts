@@ -1,4 +1,5 @@
-export type AnyObject<T extends any = any> = Record<string | number, T>
+export type AnyObjectKey = string | number | symbol
+export type AnyObject<K extends AnyObjectKey = AnyObjectKey, V extends any = any> = Record<K, V>
 
 export const sortByKey = <T extends AnyObject>(object: T): T => {
     return Object.keys(object).sort().reduce(

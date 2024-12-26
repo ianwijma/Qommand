@@ -15,20 +15,31 @@ const TitleBarButton = ({children, onClick}: TitleBarButtonProps) => {
     </button>
 }
 
-type TitleBarProps = PropsWithChildren & {}
+type TitleBarProps = PropsWithChildren & {
+    showMinimize?: boolean;
+    showClose?: boolean;
+}
 
-export const TitleBar = ({children}: TitleBarProps) => {
+export const TitleBar = ({children, showMinimize = true, showClose = true}: TitleBarProps) => {
     const {minimize, close} = useWindowControls();
 
     return <div id='title-bar' className='flex justify-between bg-slate-800 px-1 py-1'>
         <span className='max-w-[1000px] overflow-ellipsis overflow-hidden'>{children}</span>
         <div className='flex gap-2'>
-            <TitleBarButton onClick={minimize}>
-                <FontAwesomeIcon icon={faWindowMinimize} size='xs'/>
-            </TitleBarButton>
-            <TitleBarButton onClick={close}>
-                <FontAwesomeIcon icon={faXmark} size='sm'/>
-            </TitleBarButton>
+            {
+                showMinimize && (
+                    <TitleBarButton onClick={minimize}>
+                        <FontAwesomeIcon icon={faWindowMinimize} size='xs'/>
+                    </TitleBarButton>
+                )
+            }
+            {
+                showClose && (
+                    <TitleBarButton onClick={close}>
+                        <FontAwesomeIcon icon={faXmark} size='sm'/>
+                    </TitleBarButton>
+                )
+            }
         </div>
     </div>
 }

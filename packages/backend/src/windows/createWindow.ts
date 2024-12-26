@@ -1,31 +1,58 @@
-import {BrowserWindow, dialog} from "electron";
+import {BrowserWindow} from "electron";
 import path from "path";
-import {addEmitEventHandler, emitEvent} from '@qommand/common/src/eventSubscriptions'
+import {addEmitEventHandler, emitEventWithDefaultHandler} from '@qommand/common/src/eventSubscriptions'
 import {getEventByName} from "@qommand/common/src/events/eventsByName";
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
 import {getSettingByName} from "../settings/settingsByName";
+import {simpleInputDialog} from "./dialog.window";
+
+type UrlParams = { [key: string]: string };
 
 export type CreateWindowParams = {
     title: string,
     route: string,
+    defaultUrlParams?: UrlParams,
+    width?: number,
+    height?: number,
+    minWidth?: number,
+    minHeight?: number,
+    resizable?: boolean,
 }
+
+type OpenParams = { urlParams?: UrlParams }
 
 export type CreateWindowReturn = {
     initialize: () => Promise<void>;
-    open: () => Promise<void>;
+    open: (params?: OpenParams) => Promise<void>;
     close: () => Promise<void>;
     minimize: () => Promise<void>;
     openDevTools: () => Promise<void>;
     closeDevTools: () => Promise<void>;
+    getWindow: () => BrowserWindow;
 };
 
-export const createWindow = ({title, route}: CreateWindowParams): CreateWindowReturn => {
+export const createWindow = ({
+                                 title,
+                                 route,
+                                 defaultUrlParams,
+                                 width = 1080,
+                                 height = 700,
+                                 minWidth = 1080,
+                                 minHeight = 700,
+                                 resizable = true
+                             }: CreateWindowParams): CreateWindowReturn => {
     let window: BrowserWindow;
     let loadWindowPromise: Promise<void>;
 
     const isInitialized = () => {
         if (!window) throw new Error("Window was not initialized");
+    }
+
+    const getWindow = () => {
+        isInitialized();
+
+        return window;
     }
 
     const openDevTools = async () => {
@@ -50,25 +77,44 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         if (isDev() || 'dev' in startupArguments) closeDevTools();
 
         // Reset the window content.
-        loadWindowPromise = loadWindow();
+        loadWindowPromise = loadWindow({urlParams: defaultUrlParams});
     }
     const minimize = async () => {
         isInitialized();
 
         window.minimize();
     }
-    const loadWindow = async () => {
-        isInitialized();
+    const getUrl = ({urlParams}: { urlParams: UrlParams }): string => {
+        const queryParams = new URLSearchParams(urlParams).toString();
 
         if (isDev()) {
-            await window.loadURL(`http://localhost:3000/${route}`);
+            return `http://localhost:3000/${route}?${queryParams}`
+        }
+
+        return path.join(__dirname, `../renderer/the_window/${route}.html?${queryParams}`);
+    }
+    const loadWindow = async ({urlParams}: { urlParams: UrlParams }) => {
+        isInitialized();
+
+        const url = getUrl({urlParams});
+
+        if (isDev()) {
+            await window.loadURL(url);
         } else {
-            // TODO: Make work
-            await window.loadFile(path.join(__dirname, `../renderer/the_window/${route}.html`));
+            await window.loadFile(url);
         }
     }
-    const open = async () => {
+    const open = async ({urlParams}: OpenParams = {}) => {
         isInitialized();
+
+        const wantedUrl = getUrl({urlParams: urlParams});
+        const currentUrl = window.webContents.getURL();
+        if (currentUrl !== wantedUrl) {
+            // Close window before loading new content.
+            await close();
+
+            loadWindowPromise = loadWindow({urlParams: urlParams});
+        }
 
         if (window.isVisible()) {
             window.show();
@@ -79,13 +125,14 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         }
 
         // Always trigger, ensure the dev tools are open
-        if (isDev() || 'dev' in startupArguments) openDevTools();
+        if (isDev() || 'dev' in startupArguments) await openDevTools();
     }
 
     const initializeEventListeners = () => {
         isInitialized();
 
         window.webContents.on('ipc-message', async (_, action, ...params) => {
+            console.log('ipc-message', action, params)
             switch (action) {
                 case 'close': {
                     close();
@@ -96,9 +143,9 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
                 }
                     break;
                 case 'event-subscription-to-main': {
-                    const [eventName, eventData] = params;
+                    const [eventName, args] = params;
                     const event = getEventByName(eventName);
-                    emitEvent(event, eventData);
+                    emitEventWithDefaultHandler(event, ...args);
                 }
                     break;
                 case 'submit-setting-update': {
@@ -115,14 +162,23 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
                 }
                     break;
                 case 'open-dialog': {
+                    // TODO: Update
                     const [id, dialogFunction, ...dialogOptions] = params;
-                    if (dialogFunction in dialog) {
-                        // @ts-ignore checking functions
-                        const results = await dialog[dialogFunction](...dialogOptions);
-                        window.webContents.send('open-dialog-response', id, results);
-                    } else {
-                        throw new Error(`Unknown dialog function ${dialogFunction}`);
-                    }
+                    const results = await simpleInputDialog.open({
+                        title: 'Wow, such title',
+                        message: 'Amazing message!~',
+                        inputPlaceholder: 'Amazing message...',
+                    });
+
+                    window.webContents.send('open-dialog-response', id, results);
+
+
+                    // if (dialogFunction in dialog) {
+                    //     // @ts-ignore checking functions
+                    //     const results = await dialog[dialogFunction](...dialogOptions);
+                    // } else {
+                    //     throw new Error(`Unknown dialog function ${dialogFunction}`);
+                    // }
                 }
                     break;
             }
@@ -138,10 +194,11 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
 
         window = new BrowserWindow({
             show: false,
-            width: 1080,
-            height: 700,
-            minWidth: 1080,
-            minHeight: 700,
+            width: width < minWidth ? minWidth : width,
+            height: height < minHeight ? minHeight : height,
+            minWidth: minWidth,
+            minHeight: minHeight,
+            resizable: resizable,
             frame: false,
             autoHideMenuBar: true,
             title,
@@ -150,7 +207,7 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
             },
         })
 
-        loadWindowPromise = loadWindow();
+        loadWindowPromise = loadWindow({urlParams: defaultUrlParams});
 
         initializeEventListeners();
     }
@@ -162,5 +219,6 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         minimize,
         openDevTools,
         closeDevTools,
+        getWindow,
     }
 }

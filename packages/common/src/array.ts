@@ -1,11 +1,11 @@
-import {AnyObject} from "./object";
+import {AnyObject, AnyObjectKey} from "./object";
 
-export const arrayToObjectBy = <T extends AnyObject>(array: T[], target: keyof T): AnyObject<T> => {
+export const arrayToObjectBy = <T extends AnyObject>(array: T[], target: keyof T): AnyObject<AnyObjectKey, T> => {
     return array.reduce((acc, curr) => {
         const key = curr[target];
 
         acc[key] = curr;
 
         return acc
-    }, {} as AnyObject<T>)
+    }, {} as AnyObject<AnyObjectKey, T>)
 }
