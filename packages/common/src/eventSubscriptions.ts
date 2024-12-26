@@ -1,6 +1,5 @@
 import {sortByKey} from "./object";
 import {EventName, EventType} from "./events.types";
-import {eventByName} from "./events/eventsByName";
 
 export type Subscriptions<T extends EventType> = {
     [key: number]: (event: T, ...args: any[]) => void;
@@ -47,14 +46,6 @@ export const emitEvent = (event: EventType, ...args: any[]) => {
 // This function can be useful for prevents an event loop, caused by additional emitEventHandlers.
 export const emitEventWithDefaultHandler = (event: EventType, ...args: any[]) => {
     defaultEventHandler(event, ...args);
-}
-
-export const getEventByName = (name: EventName): EventType => {
-    if (name in eventByName) {
-        return eventByName[name];
-    } else {
-        throw new Error(`Event with ${name} does not exist, did not miss to add it to the events/index.ts file?`);
-    }
 }
 
 export const addEmitEventHandler = (emitEventHandler: EmitEventHandler) => {

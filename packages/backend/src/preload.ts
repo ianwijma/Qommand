@@ -6,11 +6,14 @@ import {
     emitEvent,
     subscribe,
     addEmitEventHandler,
-    emitEventWithDefaultHandler, getEventByName
+    emitEventWithDefaultHandler
 } from "@qommand/common/src/eventSubscriptions";
+import {getEventByName} from "@qommand/common/src/events/eventsByName";
 import {onSettingsUpdated} from "@qommand/common/src/events/settingUpdated.event";
 import {EventName} from "@qommand/common/src/events.types";
 import {SettingsName} from "./settings/createSettings";
+import type {Dialog} from 'electron';
+import {nanoid} from "nanoid";
 
 /**
  * This file is generically shared with all windows for now.
@@ -54,4 +57,21 @@ contextBridge.exposeInMainWorld('settingsApi', {
     updateSettings: <T extends BaseSettings>(updatedSettings: T) => ipcRenderer.send('submit-setting-update', updatedSettings),
 })
 
+type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never;
+
+contextBridge.exposeInMainWorld('dialogApi', {
+    open: async <T extends keyof Dialog>(dialogName: T, ...dialogOptions: ArgumentTypes<Dialog[T]>) => {
+        return new Promise((resolve, reject) => {
+            const id = nanoid();
+
+            ipcRenderer.on('open-dialog-response', (_, responseId, results) => {
+                if (responseId === id) {
+                    resolve(results);
+                }
+            })
+
+            ipcRenderer.send('open-dialog', id, dialogName, ...dialogOptions);
+        })
+    }
+})
 

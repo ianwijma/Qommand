@@ -4,7 +4,7 @@ import {mainWindow} from "./windows/mainWindow";
 import {settingsWindow} from "./windows/settingsWindow";
 import {defaultTray} from "./tray/defaultTray";
 import {taskWindow} from "./windows/taskWindow";
-import {tasksSettings} from "./settings";
+import {taskFolderSettings, tasksSettings} from "./settings";
 import {startupArguments} from "./utils/startupArguments";
 import {isDev} from "./utils/isDev";
 
@@ -18,6 +18,7 @@ if (!isSingleInstance) {
     app.quit();
 } else {
     const onReady = async () => {
+        await taskFolderSettings.initialize();
         await tasksSettings.initialize();
         await taskWindow.initialize();
         await mainWindow.initialize();

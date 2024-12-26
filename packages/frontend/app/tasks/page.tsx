@@ -1,9 +1,9 @@
 import {DefaultWindowContainer} from "../../components/windowContainer/DefaultWindowContainer";
-import {TaskList} from "./TaskList";
+import {TaskManager} from "./TaskManager";
 
 
 export default function QommandPage() {
     return <DefaultWindowContainer title={"Tasks"}>
-        <TaskList/>
+        <TaskManager/>
     </DefaultWindowContainer>
 }

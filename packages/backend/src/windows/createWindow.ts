@@ -1,9 +1,10 @@
-import {BrowserWindow} from "electron";
+import {BrowserWindow, dialog} from "electron";
 import path from "path";
-import {addEmitEventHandler, emitEvent, getEventByName} from '@qommand/common/src/eventSubscriptions'
+import {addEmitEventHandler, emitEvent} from '@qommand/common/src/eventSubscriptions'
+import {getEventByName} from "@qommand/common/src/events/eventsByName";
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
-import {settingsByName} from "../settings/settingsByName";
+import {getSettingByName} from "../settings/settingsByName";
 
 export type CreateWindowParams = {
     title: string,
@@ -70,14 +71,15 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
         isInitialized();
 
         if (window.isVisible()) {
-            window.show()
+            window.show();
         } else {
             await loadWindowPromise;
 
             window.show();
-
-            if (isDev() || 'dev' in startupArguments) openDevTools();
         }
+
+        // Always trigger, ensure the dev tools are open
+        if (isDev() || 'dev' in startupArguments) openDevTools();
     }
 
     const initializeEventListeners = () => {
@@ -102,15 +104,27 @@ export const createWindow = ({title, route}: CreateWindowParams): CreateWindowRe
                 case 'submit-setting-update': {
                     const [settingToUpdate] = params;
                     const {name} = settingToUpdate;
-                    const settings = settingsByName[name];
+                    const settings = getSettingByName(name);
                     await settings.updateSettings(settingToUpdate);
                 }
                     break;
                 case 'request-settings': {
                     const [settingName] = params;
-                    const settings = settingsByName[settingName];
+                    const settings = getSettingByName(settingName);
                     window.webContents.send('request-settings-response', settings.name, settings.getSettings());
                 }
+                    break;
+                case 'open-dialog': {
+                    const [id, dialogFunction, ...dialogOptions] = params;
+                    if (dialogFunction in dialog) {
+                        // @ts-ignore checking functions
+                        const results = await dialog[dialogFunction](...dialogOptions);
+                        window.webContents.send('open-dialog-response', id, results);
+                    } else {
+                        throw new Error(`Unknown dialog function ${dialogFunction}`);
+                    }
+                }
+                    break;
             }
         });
 

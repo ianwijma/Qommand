@@ -7,5 +7,5 @@ export const tasksSettings = createSettings<TasksSettings>({
     defaultSettings: {
         version: 1,
         tasks: []
-    }
-})
+    },
+});

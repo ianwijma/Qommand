@@ -1,4 +1,4 @@
-type AnyObject = Record<string | number, any>
+export type AnyObject<T extends any = any> = Record<string | number, T>
 
 export const sortByKey = <T extends AnyObject>(object: T): T => {
     return Object.keys(object).sort().reduce(
@@ -8,5 +8,4 @@ export const sortByKey = <T extends AnyObject>(object: T): T => {
         },
         {} as T
     );
-
 }
