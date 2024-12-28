@@ -143,6 +143,7 @@ export const createWindow = ({
                 }
                     break;
                 case 'event-subscription-to-main': {
+                    console.log('event-subscription-to-main', params);
                     const [eventName, args] = params;
                     const event = getEventByName(eventName);
                     emitEventWithDefaultHandler(event, ...args);
@@ -185,6 +186,7 @@ export const createWindow = ({
         });
 
         addEmitEventHandler((event, ...args) => {
+            console.log('event-subscription-to-renderer', event, ...args);
             window.webContents.send('event-subscription-to-renderer', event.name, ...args);
         });
     }

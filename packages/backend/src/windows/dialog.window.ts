@@ -22,7 +22,7 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
         open: (urlParams: OP): Promise<OR> => {
             return new Promise<OR>(async (resolve) => {
                 const dialogId = nanoid();
-                const {open, close, initialize} = createWindow({
+                const {open, close, initialize, getWindow} = createWindow({
                     title,
                     route,
                     resizable: false,
@@ -32,20 +32,28 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
                     minHeight: 256,
                 });
 
+                const closeAndClean = async () => {
+                    await close();
+
+                    const window = getWindow();
+
+                    window.destroy();
+                }
+
                 await initialize();
 
                 const resolveButtonId = (buttonAction: string): string => `${buttonAction}::${dialogId}`
                 onButtonClickedEvent((buttonAction, buttonData: OR) => {
-                    console.log(buttonAction, buttonData);
+                    console.log('onButtonClickedEvent', buttonAction, buttonData);
                     switch (buttonAction) {
                         case resolveButtonId('cancel'): {
                             resolve(buttonData);
-                            close();
+                            closeAndClean();
                         }
                             break;
                         case resolveButtonId('ok'): {
                             resolve(buttonData);
-                            close();
+                            closeAndClean();
                         }
                             break;
                     }

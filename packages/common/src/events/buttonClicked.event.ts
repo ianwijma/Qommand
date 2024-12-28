@@ -7,6 +7,9 @@ export const ButtonClickedEvent: EventType = {
 };
 
 export const emitButtonClickedEvent = (buttonId: string, buttonData: AnyObject = {}) => {
+    console.log("emitButtonClickedEvent", buttonId, buttonData);
+    // TODO: emitEvent does not work on the frontend, as in the frontend the eventSubscriptions is non-existing really.
+    // The frontend needs to use the exposed events from the preload. AK window.eventSubscriptionApi.emit
     emitEvent(ButtonClickedEvent, buttonId, buttonData);
 }
 

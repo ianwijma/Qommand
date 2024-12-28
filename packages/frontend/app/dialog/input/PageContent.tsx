@@ -12,7 +12,10 @@ export const PageContent = () => {
     const inputPlaceholder = searchParams.get('inputPlaceholder');
 
     const handleCancel = () => emitButtonClickedEvent(`cancel::${dialogId}`);
-    const handleOk = () => emitButtonClickedEvent(`ok::${dialogId}`, {input: ref.current.value});
+    const handleOk = () => {
+        console.log('handleOf')
+        emitButtonClickedEvent(`ok::${dialogId}`, {input: ref.current.value})
+    };
 
     return (
         <>
