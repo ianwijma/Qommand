@@ -8,5 +8,9 @@
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.13.0",
     "typescript-eslint": "^8.18.0"
+  },
+  "dependencies": {
+    "winston": "^3.17.0",
+    "winston-transport": "^4.9.0"
   }
 }

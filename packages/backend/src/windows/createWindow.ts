@@ -6,6 +6,7 @@ import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
 import {getSettingByName} from "../settings/settingsByName";
 import {simpleInputDialog} from "./dialog.window";
+import {logger} from "../utils/logger";
 
 type UrlParams = { [key: string]: string };
 
@@ -132,7 +133,7 @@ export const createWindow = ({
         isInitialized();
 
         window.webContents.on('ipc-message', async (_, action, ...params) => {
-            console.log('ipc-message', action, params)
+            logger.verbose('ipc-message', action, params)
             switch (action) {
                 case 'close': {
                     close();
@@ -143,7 +144,7 @@ export const createWindow = ({
                 }
                     break;
                 case 'event-subscription-to-main': {
-                    console.log('event-subscription-to-main', params);
+                    logger.verbose('event-subscription-to-main', params);
                     const [eventName, args] = params;
                     const event = getEventByName(eventName);
                     emitEventWithDefaultHandler(event, ...args);
@@ -186,13 +187,13 @@ export const createWindow = ({
         });
 
         addEmitEventHandler((event, ...args) => {
-            console.log('event-subscription-to-renderer', event, ...args);
+            logger.verbose('event-subscription-to-renderer', event, ...args);
             window.webContents.send('event-subscription-to-renderer', event.name, ...args);
         });
     }
 
     const initialize = async () => {
-        console.log(`Initializing ${title} window`);
+        logger.verbose(`Initializing ${title} window`);
 
         window = new BrowserWindow({
             show: false,

@@ -1,6 +1,7 @@
 import {fileExists, readYamlFile, writeYamlFile} from "../utils/files";
 import {BaseSettings} from "@qommand/common/src/settings.types";
 import {emitSettingUpdatedEvent} from '@qommand/common/src/events/settingUpdated.event'
+import {logger} from "../utils/logger";
 
 export type SettingsName = string;
 
@@ -31,7 +32,7 @@ export const createSettings = <T extends BaseSettings>({
     }
 
     const initialize = async () => {
-        console.log(`Initializing ${name} settings`);
+        logger.info(`Initializing ${name} settings`);
 
         await syncSettings();
     }

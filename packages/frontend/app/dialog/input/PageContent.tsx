@@ -3,6 +3,7 @@
 import {useRef} from "react";
 import {useSearchParams} from "next/navigation";
 import {emitButtonClickedEvent} from '@qommand/common/src/events/buttonClicked.event'
+import {logger} from "../../../utils/logger";
 
 export const PageContent = () => {
     const ref = useRef<HTMLInputElement>(null);
@@ -13,7 +14,7 @@ export const PageContent = () => {
 
     const handleCancel = () => emitButtonClickedEvent(`cancel::${dialogId}`);
     const handleOk = () => {
-        console.log('handleOf')
+        logger.silly('handleOk')
         emitButtonClickedEvent(`ok::${dialogId}`, {input: ref.current.value})
     };
 

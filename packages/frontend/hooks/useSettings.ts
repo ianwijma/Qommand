@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {BaseSettings} from "@qommand/common/src/settings.types";
 import {SettingsName} from "qommand/src/settings/createSettings";
 import {isClient} from "../utils/isClient";
+import {logger} from "../utils/logger";
 
 export const useSettings = <T extends BaseSettings>(settingsName: SettingsName) => {
     const [settings, setSettings] = useState<T>(null);
@@ -19,7 +20,7 @@ export const useSettings = <T extends BaseSettings>(settingsName: SettingsName) 
     }, []);
 
     const updateSettings = (settingsToUpdate: T) => {
-        console.log(settingsToUpdate);
+        logger.debug('settingsToUpdate', settingsToUpdate);
         // @ts-ignore
         window.settingsApi.updateSettings(settingsToUpdate);
     }

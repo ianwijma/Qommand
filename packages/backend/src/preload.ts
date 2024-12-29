@@ -1,3 +1,6 @@
+// @ts-ignore
+window.IS_PRELOAD = true;
+
 import {BaseSettings} from "@qommand/common/src/settings.types";
 
 const {contextBridge, ipcRenderer} = require('electron/renderer'); // Needs to be require for some reason?
@@ -32,6 +35,10 @@ ipcRenderer.on('event-subscription-to-renderer', (_, eventName: EventName, ...ar
 contextBridge.exposeInMainWorld('windowApi', {
     close: () => ipcRenderer.send('close'),
     minimize: () => ipcRenderer.send('minimize'),
+})
+
+contextBridge.exposeInMainWorld('loggingApi', {
+    send: (...args: any[]) => ipcRenderer.send('logging-to-main', ...args),
 })
 
 contextBridge.exposeInMainWorld('eventSubscriptionApi', {
