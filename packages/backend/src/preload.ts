@@ -9,7 +9,6 @@ import {
     emitEvent,
     subscribe,
     addEmitEventHandler,
-    emitEventWithDefaultHandler
 } from "@qommand/common/src/eventSubscriptions";
 import {getEventByName} from "@qommand/common/src/events/eventsByName";
 import {onSettingsUpdated} from "@qommand/common/src/events/settingUpdated.event";
@@ -23,13 +22,17 @@ import {nanoid} from "nanoid";
  */
 
 addEmitEventHandler((event, ...args) => {
+    console.log('event-subscription-to-main', event, ...args);
+
     ipcRenderer.send('event-subscription-to-main', event.name, ...args);
 })
 
 ipcRenderer.on('event-subscription-to-renderer', (_, eventName: EventName, ...args: any[]) => {
     const event = getEventByName(eventName);
 
-    emitEventWithDefaultHandler(event, ...args);
+    console.log('event-subscription-to-renderer', event, ...args);
+
+    emitEvent(event, ...args);
 })
 
 contextBridge.exposeInMainWorld('windowApi', {
@@ -42,8 +45,17 @@ contextBridge.exposeInMainWorld('loggingApi', {
 })
 
 contextBridge.exposeInMainWorld('eventSubscriptionApi', {
-    emitEvent,
-    subscribe,
+    emitEvent: (event, ...args) => {
+        console.log('eventSubscriptionApi - emitEvent', event, ...args);
+        emitEvent(event, ...args);
+    },
+    subscribe: (event, subscriptions) => {
+        console.log('eventSubscriptionApi - subscribe', event, subscriptions);
+        subscribe(event, subscriptions);
+    },
+} as {
+    emitEvent: typeof emitEvent;
+    subscribe: typeof subscribe;
 })
 
 contextBridge.exposeInMainWorld('settingsApi', {

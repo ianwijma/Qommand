@@ -1,29 +1,67 @@
 import {sortByKey} from "./object";
 import {EventName, EventType} from "./events.types";
+import {nanoid} from "nanoid";
+import {isFrontend} from "./context";
 
 export type Subscriptions<T extends EventType> = {
     [key: number]: (event: T, ...args: any[]) => void;
 }
 
+type SubscriptionEntry = {
+    [key: string]: Subscriptions<EventType>
+}
+
 type Registry = {
-    [key: EventName]: Subscriptions<EventType>[]
+    [key: EventName]: SubscriptionEntry
 }
 
 const registry: Registry = {};
 
-const registerSubscription = <T extends EventType>(event: EventType, subscriptions: Subscriptions<T>) => {
+const registerSubscription = <T extends EventType>(event: EventType, subscriptions: Subscriptions<T>): string => {
     const {name} = event;
 
     if (!(name in registry)) {
-        registry[name] = []
+        registry[name] = {}
     }
 
-    const sortedSubscriptions = sortByKey(subscriptions);
+    const subscriptionId = nanoid();
+    registry[name][subscriptionId] = [];
 
-    registry[event.name].push(sortedSubscriptions);
+    const sortedSubscriptions = sortByKey(subscriptions);
+    registry[event.name][subscriptionId] = sortedSubscriptions;
+
+    return subscriptionId;
 }
-export const subscribe = <T extends EventType>(event: EventType, subscriptions: Subscriptions<T>) => {
-    registerSubscription(event, subscriptions);
+
+const unsubscribe = (event: EventType, subscriptionId: string) => {
+    delete registry?.[event.name]?.[subscriptionId]
+}
+
+export type subscribeUnsubscribeFn = () => void;
+
+export const subscribeFn = <T extends EventType>(event: EventType, subscriptions: Subscriptions<T>): subscribeUnsubscribeFn => {
+    const subscribeId = registerSubscription(event, subscriptions);
+
+    return () => unsubscribe(event, subscribeId)
+}
+
+export const subscribe: typeof subscribeFn = (...args) => {
+    if (isFrontend) {
+        // @ts-ignore
+        return window?.eventSubscriptionApi?.subscribe(...args);
+    } else {
+        return subscribeFn(...args);
+    }
+}
+
+const trackedEvents: { [key: string]: boolean } = {};
+
+const trackEvent = (event: EventType) => {
+    trackedEvents[event.trackId] = true;
+}
+
+const isTrackedEvent = (event: EventType) => {
+    return event.trackId in trackedEvents
 }
 
 export type EmitEventHandler = (event: EventType, ...args: any[]) => void
@@ -31,7 +69,8 @@ export type EmitEventHandler = (event: EventType, ...args: any[]) => void
 const defaultEventHandler: EmitEventHandler = (event: EventType, ...args: any[]) => {
     const {name} = event;
 
-    const eventSubscriptions = registry[name] ?? [];
+    const nestedEventSubscriptions = Object.values(registry[name])
+    const eventSubscriptions = nestedEventSubscriptions.flat();
 
     eventSubscriptions.forEach((subscriptions) => {
         Object.values(subscriptions).forEach((subscription) => {
@@ -46,14 +85,24 @@ const triggerEmitEventHandlers = (event: EventType, ...args: any[]) => {
     emitEventHandlers.forEach((emitEventHandler) => emitEventHandler(event, ...args))
 }
 
-export const emitEvent = (event: EventType, ...args: any[]) => {
-    triggerEmitEventHandlers(event, ...args);
+const emitEventFn = (event: EventType, ...args: any[]) => {
+    console.log("emitEvent", event, ...args);
+    event.trackId ??= nanoid();
+    if (!isTrackedEvent(event)) {
+        trackEvent(event);
+        triggerEmitEventHandlers(event, ...args);
+    }
 }
 
-// This function can be useful for prevents an event loop, caused by additional emitEventHandlers.
-export const emitEventWithDefaultHandler = (event: EventType, ...args: any[]) => {
-    defaultEventHandler(event, ...args);
+export const emitEvent: typeof emitEventFn = (...args) => {
+    if (isFrontend) {
+        // @ts-ignore
+        window?.eventSubscriptionApi?.emitEvent(...args);
+    } else {
+        emitEventFn(...args);
+    }
 }
+
 
 export const addEmitEventHandler = (emitEventHandler: EmitEventHandler) => {
     emitEventHandlers.push(emitEventHandler);

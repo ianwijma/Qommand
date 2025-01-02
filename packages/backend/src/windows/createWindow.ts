@@ -1,12 +1,11 @@
 import {BrowserWindow} from "electron";
 import path from "path";
-import {addEmitEventHandler, emitEventWithDefaultHandler} from '@qommand/common/src/eventSubscriptions'
+import {addEmitEventHandler, emitEvent} from '@qommand/common/src/eventSubscriptions'
 import {getEventByName} from "@qommand/common/src/events/eventsByName";
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
 import {getSettingByName} from "../settings/settingsByName";
 import {simpleInputDialog} from "./dialog.window";
-import {logger} from "../utils/logger";
 
 type UrlParams = { [key: string]: string };
 
@@ -133,7 +132,7 @@ export const createWindow = ({
         isInitialized();
 
         window.webContents.on('ipc-message', async (_, action, ...params) => {
-            logger.verbose('ipc-message', action, params)
+            console.log('ipc-message', action, params)
             switch (action) {
                 case 'close': {
                     close();
@@ -144,10 +143,10 @@ export const createWindow = ({
                 }
                     break;
                 case 'event-subscription-to-main': {
-                    logger.verbose('event-subscription-to-main', params);
-                    const [eventName, args] = params;
+                    console.log('event-subscription-to-main', ...params);
+                    const [eventName, ...args] = params;
                     const event = getEventByName(eventName);
-                    emitEventWithDefaultHandler(event, ...args);
+                    emitEvent(event, ...args);
                 }
                     break;
                 case 'submit-setting-update': {
@@ -172,6 +171,7 @@ export const createWindow = ({
                         inputPlaceholder: 'Amazing message...',
                     });
 
+                    console.log('open-dialog-response', id, results);
                     window.webContents.send('open-dialog-response', id, results);
 
 
@@ -187,13 +187,13 @@ export const createWindow = ({
         });
 
         addEmitEventHandler((event, ...args) => {
-            logger.verbose('event-subscription-to-renderer', event, ...args);
+            console.log('event-subscription-to-renderer', event, ...args);
             window.webContents.send('event-subscription-to-renderer', event.name, ...args);
         });
     }
 
     const initialize = async () => {
-        logger.verbose(`Initializing ${title} window`);
+        console.log(`Initializing ${title} window`);
 
         window = new BrowserWindow({
             show: false,

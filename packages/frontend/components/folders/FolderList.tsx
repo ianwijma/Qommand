@@ -18,15 +18,16 @@ type FoldersParams = PropDrillParams & { subFolders: SubFolders };
 
 const createFolder = async (subFolders: SubFolders) => {
     // @ts-ignore
-    const name: FolderName = await window.dialogApi.open('showMessageBox', {
+    const {input = ''}: { input: FolderName } = await window.dialogApi.open('showMessageBox', {
         title: 'Give folder name',
     });
-    if (name) {
+
+    if (input.trim()) {
         const id: FolderId = nanoid();
         subFolders[id] = {
             id,
             collapsed: false,
-            name,
+            name: input.trim(),
             subFolders: {},
             targetId: null
         }

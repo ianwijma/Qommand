@@ -2,7 +2,6 @@ import {createWindow} from "./createWindow";
 import {AnyObject} from '@qommand/common/src/object'
 import {onButtonClickedEvent} from '@qommand/common/src/events/buttonClicked.event'
 import {nanoid} from "nanoid";
-import {logger} from "../utils/logger";
 
 type CreateDialogParams = {
     title: string;
@@ -44,16 +43,18 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
                 await initialize();
 
                 const resolveButtonId = (buttonAction: string): string => `${buttonAction}::${dialogId}`
-                onButtonClickedEvent((buttonAction, buttonData: OR) => {
-                    logger.debug('onButtonClickedEvent', buttonAction, buttonData);
+                const unsubscribe = onButtonClickedEvent((buttonAction, buttonData: OR) => {
+                    console.log('onButtonClickedEvent', buttonAction, buttonData);
                     switch (buttonAction) {
                         case resolveButtonId('cancel'): {
                             resolve(buttonData);
+                            unsubscribe();
                             closeAndClean();
                         }
                             break;
                         case resolveButtonId('ok'): {
                             resolve(buttonData);
+                            unsubscribe();
                             closeAndClean();
                         }
                             break;

@@ -2,11 +2,10 @@ import type {Metadata} from "next";
 import {addEmitEventHandler} from "@qommand/common/src/eventSubscriptions";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
+import '../envConfig.ts'
 
 import {config} from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
-import {isClient} from "../utils/isClient";
-import {logger} from "../utils/logger";
 
 config.autoAddCss = false
 
@@ -29,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 addEmitEventHandler((event, ...args) => {
-    logger.silly('nextJS memes', event, args);
+    console.log('nextJS memes', event, args);
     // @ts-ignore
     window?.eventSubscriptionApi?.emitEvent(event, ...args);
 })
