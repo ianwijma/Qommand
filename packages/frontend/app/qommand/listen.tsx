@@ -1,20 +1,21 @@
 'use client'
 
-import {useState} from "react";
-import {useEventSubscriptions} from "../../hooks/useEventSubscriptions";
-import {ButtonClickedEvent} from '@qommand/common/src/events/buttonClicked.event'
+import {useEffect, useState} from "react";
+import {eventHandler} from "../../utils/eventHandler";
+import {
+    specialButtonClickedName,
+    type SpecialButtonClickedData
+} from '@qommand/common/src/events/specialButtonClicked.event'
 
 export const Listen = () => {
-    const {subscribe} = useEventSubscriptions()
     const [clicked, setClicked] = useState(false);
 
-    subscribe(ButtonClickedEvent, {
-        0: () => {
-            setClicked(true);
+    useEffect(() => eventHandler.listen<SpecialButtonClickedData>(specialButtonClickedName, () => {
+        setClicked(true);
 
-            setTimeout(() => setClicked(false), 1000);
-        }
-    })
+        setTimeout(() => setClicked(false), 1000);
+    }), [])
+
 
     return <div className={clicked ? 'bg-green-500' : 'bg-red-500'}>
         {clicked ? 'Clicked' : 'Awaiting click'}

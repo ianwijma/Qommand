@@ -6,8 +6,12 @@ import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
 import {getSettingByName} from "../settings/settingsByName";
 import {simpleInputDialog} from "./dialog.window";
+import {eventBus} from "../utils/eventBus";
+import {eventHandler} from "../utils/eventHandler";
+import {closeWindowName, type CloseWindowData} from '@qommand/common/src/events/closeWindow.event';
+import {minimizeWindowName, type MinimizeWindowData} from '@qommand/common/src/events/minimizeWindow.event';
 
-type UrlParams = { [key: string]: string };
+type UrlParams = Record<string, string>;
 
 export type CreateWindowParams = {
     title: string,
@@ -85,7 +89,12 @@ export const createWindow = ({
         window.minimize();
     }
     const getUrl = ({urlParams}: { urlParams: UrlParams }): string => {
-        const queryParams = new URLSearchParams(urlParams).toString();
+        const finalUrlParams = {
+            ...urlParams,
+            __id: String(window.id)
+        }
+
+        const queryParams = new URLSearchParams(finalUrlParams).toString();
 
         if (isDev()) {
             return `http://localhost:3000/${route}?${queryParams}`
@@ -128,20 +137,41 @@ export const createWindow = ({
         if (isDev() || 'dev' in startupArguments) await openDevTools();
     }
 
+    const initializeEventBus = () => {
+        isInitialized();
+
+        eventBus.listen((data) => window.webContents.send('eventbus-from-main', data));
+
+        window.webContents.on('ipc-message', async (_, action, data) => {
+            if (action === 'eventbus-to-main') {
+                eventBus.emit(data);
+            }
+        });
+    }
+
+    const initializeWindowEventListeners = () => {
+        const isCurrentWindow = ({windowId}: { windowId: number }) => windowId === window.id;
+
+        eventHandler.listen<CloseWindowData>(closeWindowName, (data) => {
+            if (isCurrentWindow(data)) {
+                close();
+            }
+        });
+
+        eventHandler.listen<MinimizeWindowData>(minimizeWindowName, (data) => {
+            if (isCurrentWindow(data)) {
+                minimize();
+            }
+        });
+    }
+
     const initializeEventListeners = () => {
         isInitialized();
 
         window.webContents.on('ipc-message', async (_, action, ...params) => {
             console.log('ipc-message', action, params)
             switch (action) {
-                case 'close': {
-                    close();
-                }
-                    break;
-                case 'minimize': {
-                    minimize();
-                }
-                    break;
+                // TODO: Remove the rest of these events, they should be build on top of the event bus.
                 case 'event-subscription-to-main': {
                     console.log('event-subscription-to-main', ...params);
                     const [eventName, ...args] = params;
@@ -212,7 +242,9 @@ export const createWindow = ({
 
         loadWindowPromise = loadWindow({urlParams: defaultUrlParams});
 
-        initializeEventListeners();
+        initializeEventBus();
+        initializeWindowEventListeners();
+        // initializeEventListeners();
     }
 
     return {

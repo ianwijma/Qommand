@@ -1,12 +1,13 @@
 'use client'
 
-import {useEventSubscriptions} from "../../hooks/useEventSubscriptions";
-import {ButtonClickedEvent} from '@qommand/common/src/events/buttonClicked.event'
+import {
+    specialButtonClickedName,
+    type SpecialButtonClickedData
+} from '@qommand/common/src/events/specialButtonClicked.event'
+import {eventHandler} from "../../utils/eventHandler";
 
 export const Button = () => {
-    const {emitEvent} = useEventSubscriptions()
-
-    const onClick = () => emitEvent(ButtonClickedEvent)
+    const onClick = () => eventHandler.emit<SpecialButtonClickedData>(specialButtonClickedName)
 
     return <button onClick={onClick}>Click me!~</button>
 }

@@ -1,5 +1,5 @@
 // @ts-ignore
-window.IS_PRELOAD = true;
+import IpcRendererEvent = Electron.IpcRendererEvent;
 
 import {BaseSettings} from "@qommand/common/src/settings.types";
 
@@ -16,10 +16,43 @@ import {EventName} from "@qommand/common/src/events.types";
 import {SettingsName} from "./settings/createSettings";
 import type {Dialog} from 'electron';
 import {nanoid} from "nanoid";
+import {SimpleEventBusData, SimpleEventBus} from "@qommand/common/src/eventbus.types";
 
 /**
  * This file is generically shared with all windows for now.
  */
+
+contextBridge.exposeInMainWorld('eventBusApi', {
+    emit: <T extends SimpleEventBusData>(data: T) => {
+        console.log('eventBusApi - emit', data);
+
+        ipcRenderer.send('eventbus-to-main', data)
+    },
+    listen: <T extends SimpleEventBusData>(callback: (data: T) => void) => {
+        console.log('eventBusApi - listen', callback);
+
+        const handle = (_: IpcRendererEvent, data: T) => {
+            console.log('eventBusApi - listen - handle', data);
+
+            callback(data)
+        };
+
+        ipcRenderer.on('eventbus-from-main', handle);
+
+        return () => ipcRenderer.off('eventbus', handle);
+    },
+    listenOnce: <T extends SimpleEventBusData>(callback: (data: T) => void) => {
+        console.log('eventBusApi - listenOnce', callback);
+
+        const handle = (_: IpcRendererEvent, data: T) => {
+            console.log('eventBusApi - listenOnce - handle', data);
+
+            callback(data)
+        };
+
+        ipcRenderer.once('eventbus-from-main', handle);
+    },
+} as SimpleEventBus)
 
 addEmitEventHandler((event, ...args) => {
     console.log('event-subscription-to-main', event, ...args);
@@ -33,15 +66,6 @@ ipcRenderer.on('event-subscription-to-renderer', (_, eventName: EventName, ...ar
     console.log('event-subscription-to-renderer', event, ...args);
 
     emitEvent(event, ...args);
-})
-
-contextBridge.exposeInMainWorld('windowApi', {
-    close: () => ipcRenderer.send('close'),
-    minimize: () => ipcRenderer.send('minimize'),
-})
-
-contextBridge.exposeInMainWorld('loggingApi', {
-    send: (...args: any[]) => ipcRenderer.send('logging-to-main', ...args),
 })
 
 contextBridge.exposeInMainWorld('eventSubscriptionApi', {
