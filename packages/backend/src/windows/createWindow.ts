@@ -4,12 +4,11 @@ import {addEmitEventHandler, emitEvent} from '@qommand/common/src/eventSubscript
 import {getEventByName} from "@qommand/common/src/events/eventsByName";
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
-import {getSettingByName} from "../settings/settingsByName";
 import {simpleInputDialog} from "./dialog.window";
 import {eventBus} from "../utils/eventBus";
 import {eventHandler} from "../utils/eventHandler";
-import {closeWindowName, type CloseWindowData} from '@qommand/common/src/events/closeWindow.event';
-import {minimizeWindowName, type MinimizeWindowData} from '@qommand/common/src/events/minimizeWindow.event';
+import {closeWindowEventName, type CloseWindowEventData} from '@qommand/common/src/events/closeWindow.event';
+import {minimizeWindowEventName, type MinimizeWindowEventData} from '@qommand/common/src/events/minimizeWindow.event';
 
 type UrlParams = Record<string, string>;
 
@@ -152,13 +151,13 @@ export const createWindow = ({
     const initializeWindowEventListeners = () => {
         const isCurrentWindow = ({windowId}: { windowId: number }) => windowId === window.id;
 
-        eventHandler.listen<CloseWindowData>(closeWindowName, (data) => {
+        eventHandler.listen<CloseWindowEventData>(closeWindowEventName, (data) => {
             if (isCurrentWindow(data)) {
                 close();
             }
         });
 
-        eventHandler.listen<MinimizeWindowData>(minimizeWindowName, (data) => {
+        eventHandler.listen<MinimizeWindowEventData>(minimizeWindowEventName, (data) => {
             if (isCurrentWindow(data)) {
                 minimize();
             }
@@ -177,19 +176,6 @@ export const createWindow = ({
                     const [eventName, ...args] = params;
                     const event = getEventByName(eventName);
                     emitEvent(event, ...args);
-                }
-                    break;
-                case 'submit-setting-update': {
-                    const [settingToUpdate] = params;
-                    const {name} = settingToUpdate;
-                    const settings = getSettingByName(name);
-                    await settings.updateSettings(settingToUpdate);
-                }
-                    break;
-                case 'request-settings': {
-                    const [settingName] = params;
-                    const settings = getSettingByName(settingName);
-                    window.webContents.send('request-settings-response', settings.name, settings.getSettings());
                 }
                     break;
                 case 'open-dialog': {

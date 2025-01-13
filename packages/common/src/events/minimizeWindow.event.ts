@@ -1,5 +1,5 @@
-export const minimizeWindowName = 'minimizeWindow';
+export const minimizeWindowEventName = 'minimizeWindow';
 
-export type MinimizeWindowData = {
+export type MinimizeWindowEventData = {
     windowId: number;
 }

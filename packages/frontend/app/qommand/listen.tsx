@@ -3,14 +3,14 @@
 import {useEffect, useState} from "react";
 import {eventHandler} from "../../utils/eventHandler";
 import {
-    specialButtonClickedName,
-    type SpecialButtonClickedData
+    specialButtonClickedEventName,
+    type SpecialButtonClickedEventData
 } from '@qommand/common/src/events/specialButtonClicked.event'
 
 export const Listen = () => {
     const [clicked, setClicked] = useState(false);
 
-    useEffect(() => eventHandler.listen<SpecialButtonClickedData>(specialButtonClickedName, () => {
+    useEffect(() => eventHandler.listen<SpecialButtonClickedEventData>(specialButtonClickedEventName, () => {
         setClicked(true);
 
         setTimeout(() => setClicked(false), 1000);

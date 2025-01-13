@@ -1,6 +1,14 @@
 import {fileExists, readYamlFile, writeYamlFile} from "../utils/files";
 import {BaseSettings} from "@qommand/common/src/settings.types";
-import {emitSettingUpdatedEvent} from '@qommand/common/src/events/settingUpdated.event'
+import {responseHandler} from "../utils/responseHandler";
+import {eventHandler} from "../utils/eventHandler";
+import {settingsUpdatedEventName, type SettingsUpdatedEventData} from '@qommand/common/src/events/settingsUpdated.event'
+import {updateSettingsEventName, type UpdateSettingsEventData} from '@qommand/common/src/events/updateSettings.event'
+import {
+    settingsRequestName,
+    type SettingsRequestReq,
+    type SettingsRequestRes
+} from '@qommand/common/src/requests/settings.request'
 
 export type SettingsName = string;
 
@@ -56,11 +64,14 @@ export const createSettings = <T extends BaseSettings>({
 
         await syncSettings();
 
-        const updatedSetting = getSettings();
+        const updatedSettings = getSettings();
 
-        emitSettingUpdatedEvent(name, updatedSetting);
+        eventHandler.emit<SettingsUpdatedEventData<T>>(settingsUpdatedEventName, {
+            settingName: name,
+            updatedSettings
+        });
 
-        return updatedSetting;
+        return updatedSettings;
     }
 
     const resetSettings = async () => {
@@ -70,10 +81,33 @@ export const createSettings = <T extends BaseSettings>({
 
         const resetSettings = getSettings();
 
-        emitSettingUpdatedEvent(name, resetSettings);
+        eventHandler.emit<SettingsUpdatedEventData<T>>(settingsUpdatedEventName, {
+            settingName: name,
+            updatedSettings: resetSettings
+        });
 
         return resetSettings;
     }
+
+    responseHandler.handleResponse<SettingsRequestReq, SettingsRequestRes<T>>(settingsRequestName, (request) => {
+        const {settingsName: currentSettingsName} = request;
+        console.log('currentSettingsName', currentSettingsName);
+        return currentSettingsName === name;
+    }, (request) => {
+        const settings = getSettings();
+
+        console.log('handle', request, settings)
+
+        return settings;
+    });
+
+    eventHandler.listen<UpdateSettingsEventData<T>>(updateSettingsEventName, (event) => {
+        const {settingsName, settingsToUpdate} = event;
+
+        if (settingsName !== name) return;
+
+        updateSettings(settingsToUpdate);
+    })
 
     return {
         name,

@@ -3,7 +3,7 @@ import {SimpleEventBus, SimpleEventBusData} from "./eventbus.types";
 // EventHandlers are a wrapper around the eventbus, but allowing you to emit and listen to specific events.
 type StopListening = () => void;
 
-type EventHandler = {
+export type EventHandler = {
     emit: <T extends SimpleEventBusData>(eventName: string, eventData?: T) => void,
     listen: <T extends SimpleEventBusData>(eventName: string, callback: (eventData?: T) => void) => StopListening,
     listenOnce: <T extends SimpleEventBusData>(eventName: string, callback: (eventData?: T) => void) => void,
@@ -54,5 +54,6 @@ export const createEventHandler = (eventBus: SimpleEventBus): EventHandler => {
                 callback(eventData);
             })
         },
+
     }
 }

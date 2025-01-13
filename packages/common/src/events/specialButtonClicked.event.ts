@@ -1,3 +1,3 @@
-export const specialButtonClickedName = 'specialButtonClicked';
+export const specialButtonClickedEventName = 'specialButtonClicked';
 
-export type SpecialButtonClickedData = {};
+export type SpecialButtonClickedEventData = {};

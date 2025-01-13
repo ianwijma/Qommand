@@ -1,5 +1,5 @@
-export const closeWindowName = 'closeWindow';
+export const closeWindowEventName = 'closeWindow';
 
-export type CloseWindowData = {
+export type CloseWindowEventData = {
     windowId: number;
 }
