@@ -1,7 +1,5 @@
 import {BrowserWindow} from "electron";
 import path from "path";
-import {addEmitEventHandler, emitEvent} from '@qommand/common/src/eventSubscriptions'
-import {getEventByName} from "@qommand/common/src/events/eventsByName";
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
 import {eventBus} from "../utils/eventBus";
@@ -164,29 +162,6 @@ export const createWindow = ({
             if (isCurrentWindow(data)) {
                 minimize();
             }
-        });
-    }
-
-    const initializeEventListeners = () => {
-        isInitialized();
-
-        window.webContents.on('ipc-message', async (_, action, ...params) => {
-            console.log('ipc-message', action, params)
-            switch (action) {
-                // TODO: Remove the rest of these events, they should be build on top of the event bus.
-                case 'event-subscription-to-main': {
-                    console.log('event-subscription-to-main', ...params);
-                    const [eventName, ...args] = params;
-                    const event = getEventByName(eventName);
-                    emitEvent(event, ...args);
-                }
-                    break;
-            }
-        });
-
-        addEmitEventHandler((event, ...args) => {
-            console.log('event-subscription-to-renderer', event, ...args);
-            window.webContents.send('event-subscription-to-renderer', event.name, ...args);
         });
     }
 

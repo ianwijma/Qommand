@@ -3,7 +3,7 @@ import {BaseSettings} from "@qommand/common/src/settings.types";
 import {arrayToObjectBy} from "@qommand/common/src/array";
 import * as settings from "./index";
 
-// @ts-ignore Because we're importing * from an index file, TS can not ensure it's all the same type, which is fair enough.
+// @ts-expect-error Because we're importing * from an index file, TS can not ensure it's all the same type, which is fair enough.
 // But we know better...
 const settingsByName = arrayToObjectBy<CreateSettingReturn<BaseSettings>>(Object.values(settings), 'name')
 

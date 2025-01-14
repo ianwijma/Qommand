@@ -1,11 +1,11 @@
 import type {Metadata} from "next";
-import {addEmitEventHandler} from "@qommand/common/src/eventSubscriptions";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import '../envConfig.ts'
 
 import {config} from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
+import {Suspense} from "react";
 
 config.autoAddCss = false
 
@@ -27,12 +27,6 @@ export const metadata: Metadata = {
     description: "Qommand & Qonquer",
 };
 
-addEmitEventHandler((event, ...args) => {
-    console.log('nextJS memes', event, args);
-    // @ts-ignore
-    window?.eventSubscriptionApi?.emitEvent(event, ...args);
-})
-
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
@@ -43,7 +37,9 @@ export default function RootLayout({
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-        {children}
+        <Suspense fallback={null}>
+            {children}
+        </Suspense>
         </body>
         </html>
     );

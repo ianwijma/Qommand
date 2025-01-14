@@ -4,6 +4,7 @@ import {useSettings} from "../../hooks/useSettings";
 export type EditTaskProps = { taskId: TaskId }
 
 export const EditTask = ({taskId}: EditTaskProps) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {isLoading, settings, updateSettings} = useSettings<TasksSettings>('tasks');
 
     if (isLoading) return <span>loading...</span>

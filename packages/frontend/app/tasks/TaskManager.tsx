@@ -21,15 +21,17 @@ export const TaskManager = () => {
         updateSettings: updateFolderSettings
     } = useSettings<FolderSettings>('folder-tasks');
     const [taskId, setTaskId] = useState<null | TaskId>(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const unsetTaskId = () => setTaskId(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [folderId, setFolderId] = useState<null | FolderId>(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const unsetFolderId = () => setFolderId(null);
 
     const handleFolderUpdate = () => updateFolderSettings(folderSettings);
     const handleTaskUpdate = () => updateTaskSettings(taskSettings);
 
     const handleCreateFolder = async (subFolders: SubFolders) => {
-        // @ts-ignore
         const {success, data} = await createDialog<{ input: string }>({
             type: 'input',
             message: 'Give folder name',
@@ -56,7 +58,6 @@ export const TaskManager = () => {
     }
 
     const handleCreateTask = async (subFolders: SubFolders) => {
-        // @ts-ignore
         const {success, data} = await createDialog<{ input: string }>({
             type: 'input',
             message: 'Give task name',

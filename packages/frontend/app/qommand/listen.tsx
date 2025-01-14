@@ -1,11 +1,6 @@
 'use client'
 
 import {useEffect, useState} from "react";
-import {eventHandler} from "../../utils/eventHandler";
-import {
-    specialButtonClickedEventName,
-    type SpecialButtonClickedEventData
-} from '@qommand/common/src/events/specialButtonClicked.event'
 import {onButtonClicked} from "../../utils/emitButtonClick";
 
 export const Listen = () => {

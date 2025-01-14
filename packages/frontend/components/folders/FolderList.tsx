@@ -63,7 +63,6 @@ const FolderItem = ({
                         handleCreateTarget
                     }: FolderItemParams) => {
     const {id, name, collapsed, targetId, subFolders} = folder;
-    let {} = folder;
     const toggleCollapse = () => {
         folder.collapsed = !collapsed;
 

@@ -44,7 +44,7 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
                         stopListening();
 
                         if (success) {
-                            // @ts-ignore - IDK why TS is sad, the data is of correct type...
+                            // @ts-expect-error - IDK why TS is sad, the data is of correct type...
                             resolve(responseData);
                         } else {
                             reject('ResponseHandler - fetch failure');
