@@ -88,35 +88,44 @@ export const createWindow = ({
 
         window.minimize();
     }
-    const getUrl = ({urlParams}: { urlParams: UrlParams }): string => {
-        const finalUrlParams = {
+    const getHash = ({urlParams}: { urlParams: UrlParams }): Record<string, string> => {
+        isInitialized();
+
+        return {
             ...urlParams,
             __id: String(window.id)
         }
-
-        const queryParams = new URLSearchParams(finalUrlParams).toString();
+    }
+    const getUrl = (): string => {
+        isInitialized();
 
         if (isDev()) {
-            return `http://localhost:3000/${route}?${queryParams}`
+            return `http://localhost:3000/${route}`
         }
 
-        return path.join(__dirname, `../renderer/the_window/${route}.html?${queryParams}`);
+        return path.join(__dirname, `../renderer/the_window/${route}.html`);
     }
     const loadWindow = async ({urlParams}: { urlParams: UrlParams }) => {
         isInitialized();
 
-        const url = getUrl({urlParams});
+        const url = getUrl();
+        const hash = getHash({urlParams});
+        const search = new URLSearchParams(hash).toString();
 
         if (isDev()) {
-            await window.loadURL(url);
+            await window.loadURL(`${url}?${search}`);
         } else {
-            await window.loadFile(url);
+            await window.loadFile(url, {search});
         }
     }
     const open = async ({urlParams}: OpenParams = {}) => {
         isInitialized();
 
-        const wantedUrl = getUrl({urlParams: urlParams});
+        const url = getUrl();
+        const hash = getHash({urlParams});
+        const search = new URLSearchParams(hash).toString();
+        const wantedUrl = `${url}?${search}`;
+
         const currentUrl = window.webContents.getURL();
         if (currentUrl !== wantedUrl) {
             // Close window before loading new content.
