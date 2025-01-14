@@ -2,8 +2,12 @@ import {SimpleEventBusData} from "./eventbus.types";
 import {nanoid} from "nanoid";
 import {EventHandler} from "./createEventHandler";
 
+export type RequestResponseOptions = {
+    timeout?: number;
+}
+
 export type ResponseHandler = {
-    requestResponse: <RES extends SimpleEventBusData, REQ extends SimpleEventBusData = SimpleEventBusData>(requestName: string, data: REQ) => Promise<RES>;
+    requestResponse: <RES extends SimpleEventBusData, REQ extends SimpleEventBusData = SimpleEventBusData>(requestName: string, data: REQ, options?: RequestResponseOptions) => Promise<RES>;
     handleResponse: <REQ extends SimpleEventBusData, RES extends SimpleEventBusData = SimpleEventBusData>(requestName: string, shouldHandleCallback: (data: REQ) => boolean, callback: (data: REQ) => RES | Promise<RES>) => void;
 }
 
@@ -20,7 +24,7 @@ type ResponseObject<T extends SimpleEventBusData = SimpleEventBusData> = {
 
 export const createResponseHandler = (eventHandler: EventHandler): ResponseHandler => {
     return {
-        requestResponse: <RES extends SimpleEventBusData, REQ extends SimpleEventBusData = SimpleEventBusData>(requestName: string, requestData: REQ) => {
+        requestResponse: <RES extends SimpleEventBusData, REQ extends SimpleEventBusData = SimpleEventBusData>(requestName: string, requestData: REQ, options: RequestResponseOptions = {}) => {
             const requestId = nanoid();
 
             console.log('requestResponse - init', requestName, requestId, requestData);
@@ -54,10 +58,12 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
                     data: requestData
                 })
 
-                setTimeout(() => {
-                    console.log('requestResponse - timeout', requestName, requestId, done, requestData);
-                    if (!done) reject('ResponseHandler - Timed out')
-                }, 100)
+                if ('timeout' in options && options.timeout > 0) {
+                    setTimeout(() => {
+                        console.log('requestResponse - timeout', requestName, requestId, done, requestData);
+                        if (!done) reject('ResponseHandler - Timed out')
+                    }, options.timeout);
+                }
             })
         },
         handleResponse: <REQ extends SimpleEventBusData, RES extends SimpleEventBusData = SimpleEventBusData>(requestName: string, shouldHandleCallback: (data: REQ) => boolean, callback: (data: REQ) => RES | Promise<RES>) => {

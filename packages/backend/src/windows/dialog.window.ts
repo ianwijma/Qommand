@@ -2,6 +2,10 @@ import {createWindow} from "./createWindow";
 import {AnyObject} from '@qommand/common/src/object'
 import {onButtonClickedEvent} from '@qommand/common/src/events/buttonClicked.event'
 import {nanoid} from "nanoid";
+import {responseHandler} from "../utils/responseHandler";
+import {dialogRequestName, DialogRequestRes, DialogRequestReq} from '@qommand/common/src/requests/dialog.request';
+import {OpenDialogOptions} from '@qommand/common/src/dialog'
+import {SimpleEventBusData} from "@qommand/common/src/eventbus.types";
 
 type CreateDialogParams = {
     title: string;
@@ -76,7 +80,23 @@ type SimpleInputReturn = {
     input: string
 };
 
-export const simpleInputDialog = createDialog<SimpleInputParams, SimpleInputReturn>({
+export const inputDialog = createDialog<SimpleInputParams, SimpleInputReturn>({
     title: 'Input Dialog',
     route: 'dialog/input',
 });
+
+const dialogMap = {
+    input: inputDialog,
+}
+
+responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogRequestRes<SimpleEventBusData>>(dialogRequestName, () => true, async (data) => {
+    const {dialog} = data;
+    const {type, ...rest} = dialog;
+
+    if (type in dialogMap) {
+        const dialogHandler = dialogMap[type];
+        return await dialogHandler.open(rest)
+    }
+
+    return null
+})

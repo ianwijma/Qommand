@@ -6,6 +6,7 @@ import {
     TargetId
 } from '@qommand/common/src/settings/folders.settings.types'
 import {nanoid} from "nanoid";
+import {createDialog} from "../../utils/createDialog";
 
 const hasSubFolders = (subFolders: SubFolders): boolean => Object.keys(subFolders).length > 0;
 
@@ -18,7 +19,9 @@ type FoldersParams = PropDrillParams & { subFolders: SubFolders };
 
 const createFolder = async (subFolders: SubFolders) => {
     // @ts-ignore
-    const {input = ''}: { input: FolderName } = await window.dialogApi.open('showMessageBox', {
+    const {input = ''}: { input: FolderName } = await createDialog({
+        type: 'input',
+        message: 'Give folder name',
         title: 'Give folder name',
     });
 

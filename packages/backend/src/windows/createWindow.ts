@@ -4,7 +4,6 @@ import {addEmitEventHandler, emitEvent} from '@qommand/common/src/eventSubscript
 import {getEventByName} from "@qommand/common/src/events/eventsByName";
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
-import {simpleInputDialog} from "./dialog.window";
 import {eventBus} from "../utils/eventBus";
 import {eventHandler} from "../utils/eventHandler";
 import {closeWindowEventName, type CloseWindowEventData} from '@qommand/common/src/events/closeWindow.event';
@@ -181,14 +180,14 @@ export const createWindow = ({
                 case 'open-dialog': {
                     // TODO: Update
                     const [id, dialogFunction, ...dialogOptions] = params;
-                    const results = await simpleInputDialog.open({
-                        title: 'Wow, such title',
-                        message: 'Amazing message!~',
-                        inputPlaceholder: 'Amazing message...',
-                    });
+                    // const results = await simpleInputDialog.open({
+                    //     title: 'Wow, such title',
+                    //     message: 'Amazing message!~',
+                    //     inputPlaceholder: 'Amazing message...',
+                    // });
 
-                    console.log('open-dialog-response', id, results);
-                    window.webContents.send('open-dialog-response', id, results);
+                    // console.log('open-dialog-response', id, results);
+                    // window.webContents.send('open-dialog-response', id, results);
 
 
                     // if (dialogFunction in dialog) {

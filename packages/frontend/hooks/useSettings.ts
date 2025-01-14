@@ -17,7 +17,11 @@ export const useSettings = <T extends BaseSettings>(settingsName: SettingsName) 
     const isLoading = settings === null;
 
     const initializeSettings = async () => {
-        const initialSettings = await responseHandler.requestResponse<SettingsRequestRes<T>, SettingsRequestReq>(settingsRequestName, {settingsName});
+        const initialSettings = await responseHandler.requestResponse<SettingsRequestRes<T>, SettingsRequestReq>(
+            settingsRequestName,
+            {settingsName},
+            {timeout: 200}
+        );
 
         setSettings(initialSettings);
     }
