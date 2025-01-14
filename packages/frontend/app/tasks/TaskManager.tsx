@@ -40,10 +40,10 @@ export const TaskManager = () => {
             const {input} = data;
 
             if (input.trim()) {
-                const folderId: FolderId = nanoid();
+                const newFolderId: FolderId = nanoid();
 
-                subFolders[folderId] = {
-                    id: folderId,
+                subFolders[newFolderId] = {
+                    id: newFolderId,
                     collapsed: false,
                     name: input.trim(),
                     subFolders: {},
@@ -67,11 +67,11 @@ export const TaskManager = () => {
             const {input} = data;
 
             if (input.trim()) {
-                const folderId: FolderId = nanoid();
-                const taskId: FolderId = nanoid();
+                const newFolderId: FolderId = nanoid();
+                const newTaskId: TaskId = nanoid();
 
-                taskSettings.tasks[taskId] = {
-                    id: taskId,
+                taskSettings.tasks[newTaskId] = {
+                    id: newTaskId,
                     type: "shell-script",
                     name: input,
                     script: ''
@@ -79,12 +79,12 @@ export const TaskManager = () => {
 
                 handleTaskUpdate();
 
-                subFolders[folderId] = {
-                    id: folderId,
+                subFolders[newFolderId] = {
+                    id: newFolderId,
                     collapsed: false,
                     name: input.trim(),
                     subFolders: {},
-                    targetId: taskId
+                    targetId: newTaskId
                 }
 
                 handleFolderUpdate();
@@ -97,7 +97,8 @@ export const TaskManager = () => {
         return <span>Loading...</span>
     }
 
-    const handleClick = (folderId: FolderId, taskId: TaskId) => {
+    const handleClick = (_: FolderId, taskId: TaskId) => {
+        setTaskId(taskId);
     }
 
     return <div className="w-full h-screen flex flex-row">
