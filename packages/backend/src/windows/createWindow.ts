@@ -8,6 +8,7 @@ import {eventBus} from "../utils/eventBus";
 import {eventHandler} from "../utils/eventHandler";
 import {closeWindowEventName, type CloseWindowEventData} from '@qommand/common/src/events/closeWindow.event';
 import {minimizeWindowEventName, type MinimizeWindowEventData} from '@qommand/common/src/events/minimizeWindow.event';
+import {StopListening} from "@qommand/common/src/eventbus.types";
 
 type UrlParams = Record<string, string>;
 
@@ -32,6 +33,8 @@ export type CreateWindowReturn = {
     openDevTools: () => Promise<void>;
     closeDevTools: () => Promise<void>;
     getWindow: () => BrowserWindow;
+    destroy: () => Promise<void>;
+    getUniqueWindowId: () => number;
 };
 
 export const createWindow = ({
@@ -46,6 +49,7 @@ export const createWindow = ({
                              }: CreateWindowParams): CreateWindowReturn => {
     let window: BrowserWindow;
     let loadWindowPromise: Promise<void>;
+    let stopListening: StopListening;
 
     const isInitialized = () => {
         if (!window) throw new Error("Window was not initialized");
@@ -138,7 +142,7 @@ export const createWindow = ({
     const initializeEventBus = () => {
         isInitialized();
 
-        eventBus.listen((data) => window.webContents.send('eventbus-from-main', data));
+        stopListening = eventBus.listen((data) => window.webContents.send('eventbus-from-main', data));
 
         window.webContents.on('ipc-message', async (_, action, data) => {
             if (action === 'eventbus-to-main') {
@@ -177,27 +181,6 @@ export const createWindow = ({
                     emitEvent(event, ...args);
                 }
                     break;
-                case 'open-dialog': {
-                    // TODO: Update
-                    const [id, dialogFunction, ...dialogOptions] = params;
-                    // const results = await simpleInputDialog.open({
-                    //     title: 'Wow, such title',
-                    //     message: 'Amazing message!~',
-                    //     inputPlaceholder: 'Amazing message...',
-                    // });
-
-                    // console.log('open-dialog-response', id, results);
-                    // window.webContents.send('open-dialog-response', id, results);
-
-
-                    // if (dialogFunction in dialog) {
-                    //     // @ts-ignore checking functions
-                    //     const results = await dialog[dialogFunction](...dialogOptions);
-                    // } else {
-                    //     throw new Error(`Unknown dialog function ${dialogFunction}`);
-                    // }
-                }
-                    break;
             }
         });
 
@@ -205,6 +188,16 @@ export const createWindow = ({
             console.log('event-subscription-to-renderer', event, ...args);
             window.webContents.send('event-subscription-to-renderer', event.name, ...args);
         });
+    }
+
+    const destroy = async () => {
+        isInitialized();
+
+        await close();
+
+        stopListening();
+
+        window.destroy();
     }
 
     const initialize = async () => {
@@ -232,6 +225,12 @@ export const createWindow = ({
         // initializeEventListeners();
     }
 
+    const getUniqueWindowId = () => {
+        isInitialized();
+
+        return window.id
+    }
+
     return {
         initialize,
         open,
@@ -240,5 +239,7 @@ export const createWindow = ({
         openDevTools,
         closeDevTools,
         getWindow,
+        destroy,
+        getUniqueWindowId
     }
 }

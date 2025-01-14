@@ -6,6 +6,6 @@ export const tasksSettings = createSettings<TasksSettings>({
     name: 'tasks',
     defaultSettings: {
         version: 1,
-        tasks: []
+        tasks: {}
     },
 });

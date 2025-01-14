@@ -6,11 +6,12 @@ import {
     specialButtonClickedEventName,
     type SpecialButtonClickedEventData
 } from '@qommand/common/src/events/specialButtonClicked.event'
+import {onButtonClicked} from "../../utils/emitButtonClick";
 
 export const Listen = () => {
     const [clicked, setClicked] = useState(false);
 
-    useEffect(() => eventHandler.listen<SpecialButtonClickedEventData>(specialButtonClickedEventName, () => {
+    useEffect(() => onButtonClicked('super-special-state', () => {
         setClicked(true);
 
         setTimeout(() => setClicked(false), 1000);

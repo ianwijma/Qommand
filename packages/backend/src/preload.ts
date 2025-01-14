@@ -20,15 +20,15 @@ import {SimpleEventBusData, SimpleEventBus} from "@qommand/common/src/eventbus.t
 
 contextBridge.exposeInMainWorld('eventBusApi', {
     emit: <T extends SimpleEventBusData>(data: T) => {
-        // console.log('eventBusApi - emit', data);
+        console.log('eventBusApi - emit', data);
 
         ipcRenderer.send('eventbus-to-main', data)
     },
     listen: <T extends SimpleEventBusData>(callback: (data: T) => void) => {
-        // console.log('eventBusApi - listen', callback);
+        console.log('eventBusApi - listen', callback);
 
         const handle = (_: IpcRendererEvent, data: T) => {
-            // console.log('eventBusApi - listen - handle', data);
+            console.log('eventBusApi - listen - handle', data);
 
             callback(data)
         };
@@ -38,10 +38,10 @@ contextBridge.exposeInMainWorld('eventBusApi', {
         return () => ipcRenderer.off('eventbus', handle);
     },
     listenOnce: <T extends SimpleEventBusData>(callback: (data: T) => void) => {
-        // console.log('eventBusApi - listenOnce', callback);
+        console.log('eventBusApi - listenOnce', callback);
 
         const handle = (_: IpcRendererEvent, data: T) => {
-            // console.log('eventBusApi - listenOnce - handle', data);
+            console.log('eventBusApi - listenOnce - handle', data);
 
             callback(data)
         };

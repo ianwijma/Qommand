@@ -31,8 +31,11 @@ export const useSettings = <T extends BaseSettings>(settingsName: SettingsName) 
 
         eventHandler.listen<SettingsUpdatedEventData<T>>(settingsUpdatedEventName, (response) => {
             const {updatedSettings} = response;
+            const {name} = updatedSettings;
 
-            setSettings(updatedSettings);
+            if (name === settingsName) {
+                setSettings(updatedSettings);
+            }
         });
 
         initializeSettings();

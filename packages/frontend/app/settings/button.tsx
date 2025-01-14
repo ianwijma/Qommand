@@ -1,13 +1,9 @@
 'use client'
 
-import {
-    specialButtonClickedEventName,
-    type SpecialButtonClickedEventData
-} from '@qommand/common/src/events/specialButtonClicked.event'
-import {eventHandler} from "../../utils/eventHandler";
+import {emitButtonClick} from "../../utils/emitButtonClick";
 
 export const Button = () => {
-    const onClick = () => eventHandler.emit<SpecialButtonClickedEventData>(specialButtonClickedEventName)
+    const onClick = () => emitButtonClick('super-special-state')
 
     return <button onClick={onClick}>Click me!~</button>
 }

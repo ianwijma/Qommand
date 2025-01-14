@@ -1,11 +1,15 @@
 import {createWindow} from "./createWindow";
-import {AnyObject} from '@qommand/common/src/object'
-import {onButtonClickedEvent} from '@qommand/common/src/events/buttonClicked.event'
+import {AnyObject, stringifyObject} from '@qommand/common/src/object'
+import {
+    type ButtonClickedEventData,
+    buttonClickedEventName,
+} from '@qommand/common/src/events/buttonClicked.event'
 import {nanoid} from "nanoid";
 import {responseHandler} from "../utils/responseHandler";
 import {dialogRequestName, DialogRequestRes, DialogRequestReq} from '@qommand/common/src/requests/dialog.request';
 import {OpenDialogOptions} from '@qommand/common/src/dialog'
 import {SimpleEventBusData} from "@qommand/common/src/eventbus.types";
+import {eventHandler} from "../utils/eventHandler";
 
 type CreateDialogParams = {
     title: string;
@@ -23,10 +27,9 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
                                                                        route
                                                                    }: CreateDialogParams): CreateDialogReturn<OP, OR> => {
     return {
-        open: (urlParams: OP): Promise<OR> => {
+        open: (options: OP): Promise<OR> => {
             return new Promise<OR>(async (resolve) => {
-                const dialogId = nanoid();
-                const {open, close, initialize, getWindow} = createWindow({
+                const {open, destroy, initialize, getUniqueWindowId} = createWindow({
                     title,
                     route,
                     resizable: false,
@@ -36,36 +39,31 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
                     minHeight: 256,
                 });
 
-                const closeAndClean = async () => {
-                    await close();
-
-                    const window = getWindow();
-
-                    window.destroy();
-                }
-
                 await initialize();
 
-                const resolveButtonId = (buttonAction: string): string => `${buttonAction}::${dialogId}`
-                const unsubscribe = onButtonClickedEvent((buttonAction, buttonData: OR) => {
-                    console.log('onButtonClickedEvent', buttonAction, buttonData);
-                    switch (buttonAction) {
+                const dialogId = getUniqueWindowId();
+
+                const resolveButtonId = (buttonId: string): string => `${buttonId}::${dialogId}`
+                const stopListening = eventHandler.listen<ButtonClickedEventData>(buttonClickedEventName, (data) => {
+                    console.log('Dialog Button Handling', data)
+                    const {buttonId: currentButtonId, buttonData} = data;
+                    switch (currentButtonId) {
                         case resolveButtonId('cancel'): {
-                            resolve(buttonData);
-                            unsubscribe();
-                            closeAndClean();
+                            resolve(buttonData as OR);
+                            stopListening();
+                            destroy();
                         }
                             break;
                         case resolveButtonId('ok'): {
-                            resolve(buttonData);
-                            unsubscribe();
-                            closeAndClean();
+                            resolve(buttonData as OR);
+                            stopListening();
+                            destroy();
                         }
                             break;
                     }
-                })
+                });
 
-                await open({urlParams: {...urlParams, dialogId}});
+                await open({urlParams: stringifyObject(options)});
             })
         },
     }
@@ -95,7 +93,11 @@ responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogReques
 
     if (type in dialogMap) {
         const dialogHandler = dialogMap[type];
-        return await dialogHandler.open(rest)
+        const results = await dialogHandler.open(rest)
+
+        console.log('dialog handler results', results);
+
+        return results;
     }
 
     return null

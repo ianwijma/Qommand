@@ -1,87 +1,138 @@
 import {
     Folder,
-    FolderId, FolderName,
+    FolderId,
     FolderSettings,
     SubFolders,
     TargetId
 } from '@qommand/common/src/settings/folders.settings.types'
-import {nanoid} from "nanoid";
-import {createDialog} from "../../utils/createDialog";
 
 const hasSubFolders = (subFolders: SubFolders): boolean => Object.keys(subFolders).length > 0;
+
+const MAX_LEVEL = 5;
 
 // TODO: Replace by context
 type LevelParams = { level: number }
 type OnClickParams = { onClick: (folderId: FolderId, targetId: TargetId) => void }
+type HandleUpdateParams = {
+    handleUpdate: () => void,
+    handleCreateFolder: (subFolders: SubFolders) => void | Promise<void>
+    handleCreateTarget: (subFolders: SubFolders) => void | Promise<void>
+}
 type PropDrillParams = LevelParams & OnClickParams
 
-type FoldersParams = PropDrillParams & { subFolders: SubFolders };
+type FoldersParams = PropDrillParams & HandleUpdateParams & { subFolders: SubFolders };
 
-const createFolder = async (subFolders: SubFolders) => {
-    // @ts-ignore
-    const {input = ''}: { input: FolderName } = await createDialog({
-        type: 'input',
-        message: 'Give folder name',
-        title: 'Give folder name',
-    });
 
-    if (input.trim()) {
-        const id: FolderId = nanoid();
-        subFolders[id] = {
-            id,
-            collapsed: false,
-            name: input.trim(),
-            subFolders: {},
-            targetId: null
-        }
-    }
-}
-
-const Folders = ({subFolders, level, onClick}: FoldersParams) => {
+const Folders = ({subFolders, level, onClick, handleUpdate, handleCreateFolder, handleCreateTarget}: FoldersParams) => {
     return (
-        <ul>
+        <ul style={{paddingLeft: `${level * 10}px`}}>
+            {level === 0 ? (
+                <li className='flex justify-between border-0 border-b'>
+                    <b>Folders</b>
+                    <button onClick={() => handleCreateFolder(subFolders)}>Create folder</button>
+                </li>
+            ) : ''}
             {
                 hasSubFolders(subFolders)
                     ? Object.keys(subFolders).map((folderId) => {
                         const folder = subFolders[folderId];
-                        return <FolderItem level={level} key={folderId} folder={folder} onClick={onClick}/>;
+                        return <FolderItem
+                            level={level + 1}
+                            key={folderId}
+                            folder={folder}
+                            onClick={onClick}
+                            handleCreateFolder={handleCreateFolder}
+                            handleUpdate={handleUpdate}
+                            handleCreateTarget={handleCreateTarget}
+                        />;
                     })
-                    : ''
-            }
-            {
-                level === 0
-                    ? (
-                        <li>
-                            <button onClick={() => createFolder(subFolders)}>Create folder</button>
-                        </li>
-                    )
                     : ''
             }
         </ul>
     )
 }
 
-type FolderItemParams = PropDrillParams & { folder: Folder };
+type FolderItemParams = PropDrillParams & HandleUpdateParams & { folder: Folder };
 
-const FolderItem = ({level, folder, onClick}: FolderItemParams) => {
+const FolderItem = ({
+                        level,
+                        folder,
+                        onClick,
+                        handleUpdate,
+                        handleCreateFolder,
+                        handleCreateTarget
+                    }: FolderItemParams) => {
     const {id, name, collapsed, targetId, subFolders} = folder;
+    let {} = folder;
+    const toggleCollapse = () => {
+        folder.collapsed = !collapsed;
+
+        // TODO: Collapse the sub folders as well.
+
+        handleUpdate();
+    }
+
     return (
         <li key={id}>
-            <button onClick={() => onClick(id, targetId)}>
-                {name}
-            </button>
-            <div style={{height: collapsed ? 0 : 'auto'}} className=''>
-                <Folders subFolders={subFolders} onClick={onClick} level={level}/>
+            <span className='flex justify-between'>
+                <span>
+                    {hasSubFolders(subFolders) ? (
+                        <button onClick={toggleCollapse} className='mr-2'>
+                            {collapsed ? 'V' : '>'}
+                        </button>
+                    ) : ''}
+                    <button onClick={() => targetId === null ? toggleCollapse() : onClick(id, targetId)}>
+                        {name}
+                    </button>
+                </span>
+                <span>
+                    {
+                        targetId === null ? (
+                            <button onClick={() => handleCreateTarget(subFolders)}>New Task</button>
+                        ) : ''
+                    }
+                    {' '}
+                    {
+                        targetId === null && level < MAX_LEVEL
+                            ? (
+                                <button onClick={() => handleCreateFolder(subFolders)}>Create folder</button>
+                            )
+                            : ''
+                    }
+                </span>
+            </span>
+            <div style={{height: collapsed ? 0 : 'auto'}} className='overflow-hidden'>
+                <Folders
+                    subFolders={subFolders}
+                    onClick={onClick}
+                    level={level}
+                    handleUpdate={handleUpdate}
+                    handleCreateFolder={handleCreateFolder}
+                    handleCreateTarget={handleCreateTarget}
+                />
             </div>
         </li>
     )
 }
 
-type FolderListParams = OnClickParams & { folderSettings: FolderSettings };
+type FolderListParams = OnClickParams & HandleUpdateParams & { folderSettings: FolderSettings };
 
-export const FolderList = ({folderSettings, onClick}: FolderListParams) => {
+export const FolderList = ({
+                               folderSettings,
+                               onClick,
+                               handleUpdate,
+                               handleCreateFolder,
+                               handleCreateTarget
+                           }: FolderListParams) => {
     const {subFolders} = folderSettings;
     const level = 0;
 
-    return <Folders level={level} subFolders={subFolders} onClick={onClick}/>
+    return <Folders
+        level={level}
+        subFolders={subFolders}
+        onClick={onClick}
+        handleUpdate={handleUpdate}
+        handleCreateFolder={handleCreateFolder}
+        handleCreateTarget={handleCreateTarget}
+    />
 }
