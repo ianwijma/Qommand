@@ -1,7 +1,7 @@
 import {app} from 'electron';
 import started from 'electron-squirrel-startup';
-import {mainWindow} from "./windows/main.window";
-import {settingsWindow} from "./windows/settings.window";
+import {receiveWindow} from "./windows/receive.window";
+import {sendWindow} from "./windows/send.window";
 import {defaultTray} from "./tray/defaultTray";
 import {taskWindow} from "./windows/task.window";
 import {startupArguments} from "./utils/startupArguments";
@@ -20,14 +20,20 @@ if (!isSingleInstance) {
     app.quit();
 } else {
     const onReady = async () => {
+        // Settings
         await taskFolderSettings.initialize();
         await tasksSettings.initialize();
+
+        // Windows
         await taskWindow.initialize();
-        await mainWindow.initialize();
-        await settingsWindow.initialize();
+
+        // Tray
         await defaultTray.initialize();
 
         if (isDev() || startupArguments.reset) {
+            await receiveWindow.initialize();
+            await sendWindow.initialize();
+
             await taskFolderSettings.resetSettings();
             await tasksSettings.resetSettings();
         }

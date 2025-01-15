@@ -1,7 +1,7 @@
 import {DefaultWindowContainer} from "../../components/windowContainer/DefaultWindowContainer";
 import {Metadata} from "next";
 import {Button} from "./button";
-import {Listen} from "../qommand/listen";
+import {Listen} from "../receive-event/listen";
 
 export const metadata: Metadata = {
     title: 'Settings',
