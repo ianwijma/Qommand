@@ -12,7 +12,6 @@ type OpenCreateTaskDialogOptions = {
     type: 'create-task';
 }
 
-
 export type OpenDialogOptions = OpenInputDialogOptions | OpenCreateTaskDialogOptions;
 
 export type OpenDialogResponse<T extends SimpleEventBusData> = {

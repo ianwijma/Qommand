@@ -17,7 +17,12 @@ export type ShellScriptTask = BaseTask & {
     script: string;
 }
 
-export type Tasks = NoopTask | ShellScriptTask
+export type JavascriptTask = BaseTask & {
+    type: 'javascript';
+    script: string;
+}
+
+export type Tasks = NoopTask | ShellScriptTask | JavascriptTask
 
 export type TasksSettings = BaseSettings & {
     tasks: { [key: TaskId]: Tasks }

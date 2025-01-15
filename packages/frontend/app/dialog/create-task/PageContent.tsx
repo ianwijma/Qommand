@@ -11,6 +11,7 @@ export const PageContent = () => {
     const dialogId = searchParams.get('__id');
 
     const TaskTypes = {
+        'javascript': "Javascript",
         'shell-script': "Shell Script",
         'noop': 'Blank',
     }
