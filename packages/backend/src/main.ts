@@ -24,19 +24,21 @@ if (!isSingleInstance) {
         await taskFolderSettings.initialize();
         await tasksSettings.initialize();
 
-        // Windows
-        await taskWindow.initialize();
-
-        // Tray
-        await defaultTray.initialize();
-
-        if (isDev() || startupArguments.reset) {
-            await receiveWindow.initialize();
-            await sendWindow.initialize();
-
+        if (startupArguments.reset) {
             await taskFolderSettings.resetSettings();
             await tasksSettings.resetSettings();
         }
+
+        // Windows
+        await taskWindow.initialize();
+
+        if (isDev()) {
+            await receiveWindow.initialize();
+            await sendWindow.initialize();
+        }
+
+        // Tray
+        await defaultTray.initialize();
     }
 
     app.on('ready', onReady);

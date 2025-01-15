@@ -68,7 +68,8 @@ export const createSettings = <T extends BaseSettings>({
 
         eventHandler.emit<SettingsUpdatedEventData<T>>(settingsUpdatedEventName, {
             settingName: name,
-            updatedSettings
+            updatedSettings,
+            type: 'update',
         });
 
         return updatedSettings;
@@ -83,7 +84,8 @@ export const createSettings = <T extends BaseSettings>({
 
         eventHandler.emit<SettingsUpdatedEventData<T>>(settingsUpdatedEventName, {
             settingName: name,
-            updatedSettings: resetSettings
+            updatedSettings: resetSettings,
+            type: 'reset'
         });
 
         return resetSettings;
