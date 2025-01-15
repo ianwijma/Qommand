@@ -9,4 +9,7 @@ if (isClient) {
     eventBus = window?.eventBusApi;
 }
 
+/**
+ * Do no use listen and listenOnce directly, use the useEventHandler versions instead.
+ */
 export const eventHandler = createEventHandler(eventBus);

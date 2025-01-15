@@ -1,4 +1,7 @@
 import {eventHandler} from "./eventHandler";
-import {createResponseHandler} from '@qommand/common/src/createResponseHandler'
+import {createResponseHandler, ResponseHandler} from '@qommand/common/src/createResponseHandler'
 
-export const responseHandler = createResponseHandler(eventHandler)
+/**
+ * Omitted handleResponse for now as I don't see a use for it, any data should be sent & stored on the main thread.
+ */
+export const responseHandler: Omit<ResponseHandler, 'handleResponse'> = createResponseHandler(eventHandler)

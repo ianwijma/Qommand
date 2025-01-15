@@ -1,4 +1,4 @@
-import {BrowserWindow} from "electron";
+import {BrowserWindow, screen} from "electron";
 import path from "path";
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
@@ -19,6 +19,7 @@ export type CreateWindowParams = {
     minWidth?: number,
     minHeight?: number,
     resizable?: boolean,
+    openOnCursorScreen?: boolean,
 }
 
 type OpenParams = { urlParams?: UrlParams }
@@ -43,7 +44,8 @@ export const createWindow = ({
                                  height = 700,
                                  minWidth = 1080,
                                  minHeight = 700,
-                                 resizable = true
+                                 resizable = true,
+                                 openOnCursorScreen = true,
                              }: CreateWindowParams): CreateWindowReturn => {
     let window: BrowserWindow;
     let loadWindowPromise: Promise<void>;
@@ -65,7 +67,7 @@ export const createWindow = ({
         window.webContents.openDevTools({
             mode: 'detach',
             title: `${title} Dev Tools`,
-            activate: true
+            activate: true,
         });
     }
     const closeDevTools = async () => {
@@ -78,7 +80,7 @@ export const createWindow = ({
 
         window.hide();
 
-        if (isDev() || 'dev' in startupArguments) closeDevTools();
+        if (isDev() || startupArguments.dev) closeDevTools();
 
         // Reset the window content.
         loadWindowPromise = loadWindow({urlParams: defaultUrlParams});
@@ -118,6 +120,26 @@ export const createWindow = ({
             await window.loadFile(url, {search});
         }
     }
+
+    const moveWindowToCursorScreen = () => {
+        isInitialized();
+
+        // Get mouse cursor absolute position
+        const {x, y} = screen.getCursorScreenPoint();
+
+        // Find the display where the mouse cursor will be
+        const currentDisplay = screen.getDisplayNearestPoint({x, y});
+
+        // Set window position to that display coordinates
+        window.setPosition(currentDisplay.workArea.x, currentDisplay.workArea.y);
+
+        // Center window relatively to that display
+        window.center();
+
+        // Display the window
+        window.show();
+    }
+
     const open = async ({urlParams}: OpenParams = {}) => {
         isInitialized();
 
@@ -136,14 +158,22 @@ export const createWindow = ({
 
         if (window.isVisible()) {
             window.show();
+
+            if (openOnCursorScreen) {
+                moveWindowToCursorScreen();
+            }
         } else {
             await loadWindowPromise;
 
             window.show();
+
+            if (openOnCursorScreen) {
+                moveWindowToCursorScreen();
+            }
         }
 
         // Always trigger, ensure the dev tools are open
-        if (isDev() || 'dev' in startupArguments) await openDevTools();
+        if (isDev() || startupArguments.dev) await openDevTools();
     }
 
     const initializeEventBus = () => {

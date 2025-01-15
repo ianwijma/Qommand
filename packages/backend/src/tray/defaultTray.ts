@@ -2,6 +2,8 @@ import {app, Menu, nativeImage, Tray} from "electron";
 import {mainWindow} from "../windows/main.window";
 import {settingsWindow} from "../windows/settings.window";
 import {taskWindow} from "../windows/task.window";
+import {isDev} from "../utils/isDev";
+import MenuItemConstructorOptions = Electron.MenuItemConstructorOptions;
 
 export const defaultTray = {
     async initialize() {
@@ -10,12 +12,7 @@ export const defaultTray = {
         const tray = new Tray(icon);
         tray.setToolTip('Qommand');
 
-        const contextMenu = Menu.buildFromTemplate([
-            {
-                label: 'Open Qommand Tasks',
-                type: 'normal',
-                click: () => taskWindow.open()
-            },
+        let devItems: MenuItemConstructorOptions[] = [
             {
                 label: 'Open Qommand',
                 type: 'normal',
@@ -26,6 +23,15 @@ export const defaultTray = {
                 type: 'normal',
                 click: () => settingsWindow.open()
             },
+        ]
+
+        const contextMenu = Menu.buildFromTemplate([
+            {
+                label: 'Open Qommand Tasks',
+                type: 'normal',
+                click: () => taskWindow.open()
+            },
+            ...isDev() ? devItems : [],
             {
                 type: 'separator',
             },

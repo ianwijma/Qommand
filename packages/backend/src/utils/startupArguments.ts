@@ -1,3 +1,8 @@
 import YargsParser, {Arguments} from 'yargs-parser'
 
-export const startupArguments: Arguments = YargsParser(process.argv.slice(1))
+type StartupArguments = Arguments & {
+    dev: boolean,
+    reset: boolean,
+}
+
+export const startupArguments: StartupArguments = YargsParser(process.argv.slice(1)) as StartupArguments
