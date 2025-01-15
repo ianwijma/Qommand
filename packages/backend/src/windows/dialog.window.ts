@@ -4,7 +4,6 @@ import {
     type ButtonClickedEventData,
     buttonClickedEventName,
 } from '@qommand/common/src/events/buttonClicked.event'
-import {nanoid} from "nanoid";
 import {responseHandler} from "../utils/responseHandler";
 import {dialogRequestName, DialogRequestRes, DialogRequestReq} from '@qommand/common/src/requests/dialog.request';
 import {OpenDialogOptions} from '@qommand/common/src/dialog'
@@ -83,8 +82,20 @@ export const inputDialog = createDialog<SimpleInputParams, SimpleInputReturn>({
     route: 'dialog/input',
 });
 
+type CreateTaskParams = {};
+type CreateTaskReturn = {
+    input: string,
+    type: string,
+};
+
+export const createTaskDialog = createDialog<CreateTaskParams, CreateTaskReturn>({
+    title: 'Create Tasks Dialog',
+    route: 'dialog/create-task',
+});
+
 const dialogMap = {
     input: inputDialog,
+    'create-task': createTaskDialog,
 }
 
 responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogRequestRes<SimpleEventBusData>>(dialogRequestName, () => true, async (data) => {
@@ -93,6 +104,7 @@ responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogReques
 
     if (type in dialogMap) {
         const dialogHandler = dialogMap[type];
+        // @ts-expect-error - rest can be either createTaskDialog of inputDialog, which makes rest unhappy.
         const results = await dialogHandler.open(rest)
 
         console.log('dialog handler results', results);

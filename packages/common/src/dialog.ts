@@ -2,11 +2,18 @@ import {SimpleEventBusData} from "@qommand/common/src/eventbus.types";
 import {dialogRequestName, DialogRequestRes, DialogRequestReq} from '@qommand/common/src/requests/dialog.request';
 import {ResponseHandler} from "./createResponseHandler";
 
-export type OpenDialogOptions = {
+type OpenInputDialogOptions = {
     type: 'input';
     title: string;
     message: string;
-};
+}
+
+type OpenCreateTaskDialogOptions = {
+    type: 'create-task';
+}
+
+
+export type OpenDialogOptions = OpenInputDialogOptions | OpenCreateTaskDialogOptions;
 
 export type OpenDialogResponse<T extends SimpleEventBusData> = {
     success: boolean;

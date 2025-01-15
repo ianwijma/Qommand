@@ -58,14 +58,12 @@ export const TaskManager = () => {
     }
 
     const handleCreateTask = async (subFolders: SubFolders) => {
-        const {success, data} = await createDialog<{ input: string }>({
-            type: 'input',
-            message: 'Give task name',
-            title: 'Give task name',
+        const {success, data} = await createDialog<{ input: string, type: 'noop' | 'shell-script' }>({
+            type: 'create-task',
         });
 
         if (success) {
-            const {input} = data;
+            const {input, type} = data;
 
             if (input.trim()) {
                 const newFolderId: FolderId = nanoid();
@@ -73,7 +71,7 @@ export const TaskManager = () => {
 
                 taskSettings.tasks[newTaskId] = {
                     id: newTaskId,
-                    type: "shell-script",
+                    type: type,
                     name: input,
                     script: ''
                 }

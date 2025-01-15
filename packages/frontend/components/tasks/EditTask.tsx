@@ -16,5 +16,7 @@ export const EditTask = ({taskId}: EditTaskProps) => {
 
     return <div>
         {task.name}
+        <br/>
+        {task.type}
     </div>
 }
