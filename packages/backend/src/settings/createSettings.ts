@@ -94,15 +94,9 @@ export const createSettings = <T extends BaseSettings>({
     responseHandler.handleResponse<SettingsRequestReq, SettingsRequestRes<T>>(settingsRequestName, (request) => {
         const {settingsName: currentSettingsName} = request;
 
-        console.log('currentSettingsName', currentSettingsName, name);
-
         return currentSettingsName === name;
-    }, (request) => {
-        const settings = getSettings();
-
-        console.log('handle', request, settings)
-
-        return settings;
+    }, () => {
+        return getSettings();
     });
 
     eventHandler.listen<UpdateSettingsEventData<T>>(updateSettingsEventName, (event) => {

@@ -44,8 +44,8 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
 
                 const resolveButtonId = (buttonId: string): string => `${buttonId}::${dialogId}`
                 const stopListening = eventHandler.listen<ButtonClickedEventData>(buttonClickedEventName, (data) => {
-                    console.log('Dialog Button Handling', data)
                     const {buttonId: currentButtonId, buttonData} = data;
+
                     switch (currentButtonId) {
                         case resolveButtonId('cancel'): {
                             resolve(buttonData as OR);
@@ -105,11 +105,7 @@ responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogReques
     if (type in dialogMap) {
         const dialogHandler = dialogMap[type];
         // @ts-expect-error - rest can be either createTaskDialog of inputDialog, which makes rest unhappy.
-        const results = await dialogHandler.open(rest)
-
-        console.log('dialog handler results', results);
-
-        return results;
+        return dialogHandler.open(rest)
     }
 
     return null

@@ -13,7 +13,6 @@ export const PageContent = () => {
 
     const handleCancel = () => emitButtonClick(`cancel::${dialogId}`);
     const handleOk = () => {
-        console.log('handleOk')
         emitButtonClick(`ok::${dialogId}`, {input: ref.current.value})
     };
 

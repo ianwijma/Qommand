@@ -2,11 +2,8 @@ const hasWindow = typeof window !== 'undefined';
 
 export const isFrontendBuild = typeof process !== 'undefined' && process.env.IS_NEXT_SERVER === 'true';
 export const isFrontend = !isFrontendBuild && hasWindow && process.env.NEXT_PUBLIC_IS_NEXT === 'true';
-// @ts-expect-error
 export const isPreload = hasWindow && process.env.NEXT_PUBLIC_IS_NEXT === undefined;
 export const isBackend = !isFrontendBuild && !hasWindow;
-
-console.log('context', {isFrontend, isFrontendBuild, isPreload, isBackend});
 
 let contextName: 'frontend-build' | 'frontend' | 'preload' | 'backend' | 'unknown';
 switch (true) {

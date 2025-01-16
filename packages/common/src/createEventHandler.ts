@@ -18,8 +18,6 @@ type EventObject<T extends SimpleEventBusData = SimpleEventBusData> = {
 export const createEventHandler = (eventBus: SimpleEventBus): EventHandler => {
     return {
         emit: <T extends SimpleEventBusData>(eventName: string, eventData?: T) => {
-            // console.log('createEventHandler - emit', eventName, eventData);
-
             eventBus.emit<EventObject<T>>({
                 type: 'event-handler',
                 eventName,
@@ -27,12 +25,8 @@ export const createEventHandler = (eventBus: SimpleEventBus): EventHandler => {
             })
         },
         listen: <T extends SimpleEventBusData>(eventName: string, callback: (eventData?: T) => void) => {
-            // console.log('createEventHandler - listen', eventName, callback);
-
             return eventBus.listen<EventObject<T>>((data) => {
                 const {type, eventName: currentEventName, eventData} = data;
-
-                // console.log('createEventHandler - listen - handle', eventName, eventData);
 
                 if (type !== 'event-handler') return;
                 if (eventName !== currentEventName) return;
@@ -41,12 +35,8 @@ export const createEventHandler = (eventBus: SimpleEventBus): EventHandler => {
             })
         },
         listenOnce: <T extends SimpleEventBusData>(eventName: string, callback: (eventData?: T) => void) => {
-            // console.log('createEventHandler - listenOnce', eventName, callback);
-
             return eventBus.listenOnce<EventObject<T>>((data) => {
                 const {type, eventName: currentEventName, eventData} = data;
-
-                // console.log('createEventHandler - listenOnce - handle', eventName, eventData);
 
                 if (type !== 'event-handler') return;
                 if (eventName !== currentEventName) return;

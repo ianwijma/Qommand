@@ -27,8 +27,6 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
         requestResponse: <RES extends SimpleEventBusData, REQ extends SimpleEventBusData = SimpleEventBusData>(requestName: string, requestData: REQ, options: RequestResponseOptions = {}) => {
             const requestId = nanoid();
 
-            // console.log('requestResponse - init', requestName, requestId, requestData);
-
             const REQUEST_NAME = `${requestName}-request`;
             const RESPONSE_NAME = `${requestName}-response`;
 
@@ -37,7 +35,6 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
                 let done = false;
 
                 const stopListening = eventHandler.listen<ResponseObject<RES>>(RESPONSE_NAME, (response) => {
-                    // console.log('requestResponse - listen', requestName, requestId, response);
                     const {requestId: currentRequestId, data: responseData, success} = response;
 
                     if (currentRequestId === requestId) {
@@ -54,7 +51,6 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
                     }
                 });
 
-                // console.log('requestResponse - emit', requestName, requestId, requestData);
                 eventHandler.emit<RequestObject<REQ>>(REQUEST_NAME, {
                     requestId,
                     data: requestData
@@ -62,15 +58,12 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
 
                 if ('timeout' in options && options.timeout > 0) {
                     setTimeout(() => {
-                        // console.log('requestResponse - timeout', requestName, requestId, done, requestData);
                         if (!done) reject('ResponseHandler - Timed out')
                     }, options.timeout);
                 }
             })
         },
         handleResponse: <REQ extends SimpleEventBusData, RES extends SimpleEventBusData = SimpleEventBusData>(requestName: string, shouldHandleCallback: (data: REQ) => boolean, callback: (data: REQ) => RES | Promise<RES>) => {
-            // console.log('handleResponse - init', requestName, requestName, shouldHandleCallback, callback);
-
             const REQUEST_NAME = `${requestName}-request`;
             const RESPONSE_NAME = `${requestName}-response`;
 
@@ -78,20 +71,16 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
                 const {requestId, data} = request;
 
                 const shouldHandleRequest = shouldHandleCallback(data);
-                // console.log('handleResponse - listen', requestName, requestId, request, shouldHandleRequest);
-
                 if (shouldHandleRequest) {
                     try {
                         const responseData = await callback(data);
 
-                        // console.log('handleResponse - emit', requestName, requestId, responseData);
                         eventHandler.emit<ResponseObject<RES>>(RESPONSE_NAME, {
                             requestId,
                             success: true,
                             data: responseData,
                         });
                     } catch (error) {
-                        // console.log('handleResponse - emit - ERROR', requestName, requestId, error);
                         eventHandler.emit<ResponseObject<RES>>(RESPONSE_NAME, {
                             requestId,
                             success: false,

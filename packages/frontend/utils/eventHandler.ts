@@ -5,7 +5,7 @@ import {isClient} from "./isClient";
 let eventBus: SimpleEventBus = {} as SimpleEventBus;
 
 if (isClient) {
-    // @ts-expect-error - The eventBusApi is created in the preload.ts file & is not typed yet..
+    // @ts-expect-error - The eventBusApi is created in the preload.ts file & is not typed yet.
     eventBus = window?.eventBusApi;
 }
 

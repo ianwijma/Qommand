@@ -40,7 +40,6 @@ export const useSettings = <T extends BaseSettings>(settingsName: SettingsName) 
     }, []);
 
     const updateSettings = (settingsToUpdate: T) => {
-        console.log('settingsToUpdate', settingsToUpdate);
         eventHandler.emit<UpdateSettingsEventData<T>>(updateSettingsEventName, {
             settingsName,
             settingsToUpdate
