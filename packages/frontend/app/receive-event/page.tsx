@@ -3,7 +3,7 @@ import {Listen} from "./listen";
 
 
 export default function QommandPage() {
-    return <DefaultWindowContainer title={"Qommand"}>
+    return <DefaultWindowContainer title='Receive Event'>
         Qommand Page
         <Listen/>
     </DefaultWindowContainer>

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 }
 
 export default function SettingsPage() {
-    return <DefaultWindowContainer title={"Qommand Settings"}>
+    return <DefaultWindowContainer title='Send Event'>
         Settings Page
         <Button/>
 

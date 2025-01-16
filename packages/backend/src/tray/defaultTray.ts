@@ -14,14 +14,14 @@ export const defaultTray = {
 
         let devItems: MenuItemConstructorOptions[] = [
             {
-                label: 'Open Qommand',
-                type: 'normal',
-                click: () => receiveWindow.open()
-            },
-            {
-                label: 'Open Settings',
+                label: 'Sending',
                 type: 'normal',
                 click: () => sendWindow.open()
+            },
+            {
+                label: 'Received',
+                type: 'normal',
+                click: () => receiveWindow.open()
             },
         ]
 

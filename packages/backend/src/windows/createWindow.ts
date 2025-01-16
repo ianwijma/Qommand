@@ -179,6 +179,11 @@ export const createWindow = ({
     const initializeEventBus = () => {
         isInitialized();
 
+        // Stop previous listener.
+        if (!!stopListening) {
+            stopListening();
+        }
+
         stopListening = eventBus.listen((data) => window.webContents.send('eventbus-from-main', data));
 
         window.webContents.on('ipc-message', async (_, action, data) => {
@@ -210,6 +215,8 @@ export const createWindow = ({
         await close();
 
         stopListening();
+
+        stopListening = null;
 
         window.destroy();
     }
