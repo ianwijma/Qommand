@@ -8,7 +8,7 @@ export type RequestResponseOptions = {
 
 export type ResponseHandler = {
     requestResponse: <RES extends SimpleEventBusData, REQ extends SimpleEventBusData = SimpleEventBusData>(requestName: string, data: REQ, options?: RequestResponseOptions) => Promise<RES>;
-    handleResponse: <REQ extends SimpleEventBusData, RES extends SimpleEventBusData = SimpleEventBusData>(requestName: string, shouldHandleCallback: (data: REQ) => boolean, callback: (data: REQ) => RES | Promise<RES>) => void;
+    handleResponse: <REQ extends SimpleEventBusData, RES extends SimpleEventBusData = SimpleEventBusData>(requestName: string, shouldHandleCallback: (data: REQ) => boolean | Promise<boolean>, callback: (data: REQ) => RES | Promise<RES>) => void;
 }
 
 type RequestObject<T extends SimpleEventBusData = SimpleEventBusData> = {
@@ -21,6 +21,9 @@ type ResponseObject<T extends SimpleEventBusData = SimpleEventBusData> = {
     success?: boolean;
     data?: T;
 }
+
+const ENABLE_LOG = false;
+const log = (...args: any[]) => ENABLE_LOG && console.log(...args);
 
 export const createResponseHandler = (eventHandler: EventHandler): ResponseHandler => {
     return {
@@ -35,6 +38,8 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
                 let done = false;
 
                 const stopListening = eventHandler.listen<ResponseObject<RES>>(RESPONSE_NAME, (response) => {
+                    log('responseHandler - requestResponse - listen', requestName, response);
+
                     const {requestId: currentRequestId, data: responseData, success} = response;
 
                     if (currentRequestId === requestId) {
@@ -51,6 +56,7 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
                     }
                 });
 
+                log('responseHandler - requestResponse - emit', requestName, requestId);
                 eventHandler.emit<RequestObject<REQ>>(REQUEST_NAME, {
                     requestId,
                     data: requestData
@@ -63,14 +69,18 @@ export const createResponseHandler = (eventHandler: EventHandler): ResponseHandl
                 }
             })
         },
-        handleResponse: <REQ extends SimpleEventBusData, RES extends SimpleEventBusData = SimpleEventBusData>(requestName: string, shouldHandleCallback: (data: REQ) => boolean, callback: (data: REQ) => RES | Promise<RES>) => {
+        handleResponse: <REQ extends SimpleEventBusData, RES extends SimpleEventBusData = SimpleEventBusData>(requestName: string, shouldHandleCallback: (data: REQ) => boolean | Promise<boolean>, callback: (data: REQ) => RES | Promise<RES>) => {
+            log('responseHandler - handleResponse - listen', requestName, shouldHandleCallback, callback);
+
             const REQUEST_NAME = `${requestName}-request`;
             const RESPONSE_NAME = `${requestName}-response`;
 
             eventHandler.listen<RequestObject<REQ>>(REQUEST_NAME, async (request) => {
+                log('responseHandler - listen - handle', requestName, request);
+
                 const {requestId, data} = request;
 
-                const shouldHandleRequest = shouldHandleCallback(data);
+                const shouldHandleRequest = await shouldHandleCallback(data);
                 if (shouldHandleRequest) {
                     try {
                         const responseData = await callback(data);

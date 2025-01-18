@@ -4,7 +4,8 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "node bin/dev.js",
-    "build": "node bin/build.js"
+    "build": "node bin/build.js",
+    "reset": "node bin/reset.js"
   },
   "author": "Ian Wijma (https://ian.wij.ma/)",
   "license": "",

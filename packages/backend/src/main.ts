@@ -9,6 +9,9 @@ import {isDev} from "./utils/isDev";
 import './windows/dialog.window';
 import {taskFolderSettings} from "./settings/folders.settings";
 import {tasksSettings} from "./settings/tasks.setting";
+import './run-shell';
+// TODO: isolate-vm does not work with my version of Node...
+// import './run-javascript';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {

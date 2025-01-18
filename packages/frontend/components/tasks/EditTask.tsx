@@ -1,5 +1,11 @@
 import {TaskId, Tasks, TasksSettings} from "@qommand/common/src/settings/tasks.settings.types";
+import {
+    runShellRequestName,
+    RunShellRequestReq,
+    RunShellRequestRes
+} from "@qommand/common/src/requests/runShell.request";
 import {useSettings} from "../../hooks/useSettings";
+import {responseHandler} from "../../utils/responseHandler";
 
 export type EditTaskProps = { taskId: TaskId }
 
@@ -23,22 +29,36 @@ export const EditTask = ({taskId}: EditTaskProps) => {
         updateSettings(settings);
     }
 
+    const runJavascript = async (): Promise<void> => {
+        console.log("Run Shell", task);
+        if (task.type !== "noop") {
+            const response = await responseHandler.requestResponse<RunShellRequestRes, RunShellRequestReq>(runShellRequestName, {
+                code: `
+ls -lah
+                `
+            });
+
+            console.log("Ran Shell", response);
+        }
+    }
+
     return <div>
         <input
             className='text-black'
-            value={task.name}/>
+            defaultValue={task.name}/>
         <br/>
         {task.type}
         {
-            'script' in task ? (
+            'code' in task ? (
                 <>
                     <br/>
-                    <textarea value={task.script ?? ''} className='text-black'>
+                    <textarea defaultValue={task.code ?? ''} className='text-black'>
 
                     </textarea>
                 </>
             ) : ''
         }
         <br/>
+        <button onClick={() => runJavascript()}>Run Code</button>
     </div>
 }

@@ -13,13 +13,23 @@ export type NoopTask = BaseTask & {
 }
 
 export type ShellScriptTask = BaseTask & {
-    type: 'shell-script';
-    script: string;
+    type: 'shell';
+    code: string;
+    expectedExitCode: number | null;
+    timeout: number;
 }
 
 export type JavascriptTask = BaseTask & {
     type: 'javascript';
-    script: string;
+    code: string;
+    codeInput?: Record<string, string | number | boolean>;
+    timeout?: number;
+    allowRead?: boolean;
+    allowWrite?: boolean;
+    allowNetwork?: boolean;
+    allowEnvironment?: boolean;
+    allowSystem?: boolean;
+    allowRun?: boolean;
 }
 
 export type Tasks = NoopTask | ShellScriptTask | JavascriptTask
