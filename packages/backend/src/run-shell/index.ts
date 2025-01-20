@@ -1,11 +1,4 @@
 import {exec} from "child_process";
-import {responseHandler} from "../utils/responseHandler";
-import {
-    runShellRequestName,
-    type RunShellRequestReq,
-    type RunShellRequestRes
-} from '@qommand/common/src/requests/runShell.request'
-
 
 export type RunShell = {
     code: string;
@@ -51,7 +44,3 @@ export const runShell = async ({code, expectedExitCode = null, timeout = 1000}: 
         }, timeout);
     });
 }
-
-responseHandler.handleResponse<RunShellRequestReq, RunShellRequestRes>(runShellRequestName, () => true, (request) => {
-    return runShell(request);
-});

@@ -2,6 +2,7 @@ import {useWindowControls} from "../../hooks/useWindowControls";
 import {PropsWithChildren} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faWindowMinimize, faXmark} from "@fortawesome/free-solid-svg-icons";
+import {defaultLogo} from '@qommand/common/src/logos'
 
 type TitleBarButtonProps = PropsWithChildren & {
     onClick?: () => void;
@@ -24,7 +25,12 @@ export const TitleBar = ({children, showMinimize = true, showClose = true}: Titl
     const {minimize, close} = useWindowControls();
 
     return <div id='title-bar' className='flex justify-between bg-slate-800 px-1 py-1'>
-        <span className='max-w-[1000px] overflow-ellipsis overflow-hidden'>{children}</span>
+        <div className='flex items-center gap-1'>
+            <img src={defaultLogo} alt='logo' className='w-5 h-5'/>
+            <span className='max-w-[100px] flex overflow-ellipsis overflow-hidden'>
+                {children}
+            </span>
+        </div>
         <div className='flex gap-2'>
             {
                 showMinimize && (

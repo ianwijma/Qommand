@@ -30,7 +30,7 @@ export const createSettings = <T extends BaseSettings>({
                                                            name,
                                                            defaultSettings
                                                        }: CreateSettingParams<T>): CreateSettingReturn<T> => {
-    const actuallyDefaultSettings: T = {...defaultSettings, name} as T;
+    const actuallyDefaultSettings: T = {name, ...defaultSettings} as T;
     const settingsFilePath = `settings/${name}.yaml`;
     let settingsCache: T;
 

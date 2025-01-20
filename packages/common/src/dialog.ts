@@ -12,13 +12,21 @@ type OpenCreateTaskDialogOptions = {
     type: 'create-task';
 }
 
+type OpenCreateCommandDialogOptions = {
+    type: 'create-command';
+}
+
 type OpenConfirmDialogOptions = {
     type: 'confirm';
     title: string;
     message: string;
 }
 
-export type OpenDialogOptions = OpenInputDialogOptions | OpenCreateTaskDialogOptions | OpenConfirmDialogOptions;
+export type OpenDialogOptions =
+    OpenInputDialogOptions
+    | OpenCreateTaskDialogOptions
+    | OpenCreateCommandDialogOptions
+    | OpenConfirmDialogOptions;
 
 export type OpenDialogResponse<T extends SimpleEventBusData> = {
     success: boolean;

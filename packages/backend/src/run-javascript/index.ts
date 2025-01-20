@@ -4,12 +4,6 @@ import {network} from "./network";
 import {environment} from "./environment";
 import {system} from "./system";
 import {run} from "./run";
-import {responseHandler} from "../utils/responseHandler";
-import {
-    runJavascriptRequestName,
-    type RunJavascriptRequestReq,
-    type RunJavascriptRequestRes
-} from '@qommand/common/src/requests/runJavascript.request'
 
 const isolatedVM = require('isolated-vm');
 
@@ -72,12 +66,3 @@ export const runJavascript = async ({
 
     return response;
 }
-
-responseHandler.handleResponse<RunJavascriptRequestReq, RunJavascriptRequestRes>(runJavascriptRequestName, () => {
-    console.log('About to run JS');
-
-    return true;
-}, (request) => {
-    console.log('Running Javascript', request);
-    return runJavascript(request);
-});

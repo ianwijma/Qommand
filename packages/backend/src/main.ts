@@ -7,10 +7,12 @@ import {taskWindow} from "./windows/task.window";
 import {startupArguments} from "./utils/startupArguments";
 import {isDev} from "./utils/isDev";
 import './windows/dialog.window';
-import {taskFolderSettings} from "./settings/folders.settings";
+import {commandsFolderSettings, taskFolderSettings} from "./settings/folders.settings";
 import {tasksSettings} from "./settings/tasks.setting";
 import './run-shell';
 import {resetAllSettings} from "./utils/resetAllSettings";
+import {commandsWindow} from "./windows/commands.window";
+import {commandsSettings} from "./settings/commands.setting";
 // TODO: isolate-vm does not work with my version of Node...
 // import './run-javascript';
 
@@ -27,12 +29,15 @@ if (!isSingleInstance) {
         // Settings
         await taskFolderSettings.initialize();
         await tasksSettings.initialize();
+        await commandsFolderSettings.initialize();
+        await commandsSettings.initialize();
 
         if (startupArguments.reset) {
             await resetAllSettings();
         }
 
         // Windows
+        await commandsWindow.initialize();
         await taskWindow.initialize();
 
         if (isDev()) {

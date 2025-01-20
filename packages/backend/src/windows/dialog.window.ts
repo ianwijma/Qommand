@@ -95,6 +95,17 @@ export const createTaskDialog = createDialog<CreateTaskParams, CreateTaskReturn>
     route: 'dialog/create-task',
 });
 
+type CreateCommandParams = {};
+type CreateCommandReturn = {
+    name: string,
+    type: string,
+};
+
+export const createCommandDialog = createDialog<CreateCommandParams, CreateCommandReturn>({
+    title: 'Create Command Dialog',
+    route: 'dialog/create-command',
+});
+
 type ConfirmParams = {
     title: string;
     message: string;
@@ -111,6 +122,7 @@ export const confirmDialog = createDialog<ConfirmParams, ConfirmReturn>({
 const dialogMap = {
     input: inputDialog,
     'create-task': createTaskDialog,
+    'create-command': createCommandDialog,
     'confirm': confirmDialog,
 }
 

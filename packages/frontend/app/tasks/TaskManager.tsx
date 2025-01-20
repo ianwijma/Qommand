@@ -58,7 +58,7 @@ export const TaskManager = () => {
     }
 
     const handleCreateTask = async (subFolders: SubFolders) => {
-        const {success, data} = await createDialog<{ input: string, type: 'noop' | 'shell-script' }>({
+        const {success, data} = await createDialog<{ input: string, type: 'noop' | 'shell' | 'javascript' }>({
             type: 'create-task',
         });
 
@@ -69,11 +69,12 @@ export const TaskManager = () => {
                 const newFolderId: FolderId = nanoid();
                 const newTaskId: TaskId = nanoid();
 
+                // @ts-expect-error - This file is to be removed.
                 taskSettings.tasks[newTaskId] = {
                     id: newTaskId,
                     type: type,
                     name: input,
-                    script: ''
+                    code: ''
                 }
 
                 handleTaskUpdate();
