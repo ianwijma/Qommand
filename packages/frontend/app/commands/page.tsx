@@ -101,7 +101,7 @@ export default function CommandsPage() {
     }
 
     const createCommand = async (subSubFolders: SubFolders) => {
-        if (creating) {
+        if (!creating) {
             setCreating(true);
             const {success, data} = await createDialog<{ name: string, type: 'shell' | 'script' }>({
                 type: 'create-command',
