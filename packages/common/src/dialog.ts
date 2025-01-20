@@ -12,29 +12,36 @@ type OpenCreateTaskDialogOptions = {
     type: 'create-task';
 }
 
-export type OpenDialogOptions = OpenInputDialogOptions | OpenCreateTaskDialogOptions;
+type OpenConfirmDialogOptions = {
+    type: 'confirm';
+    title: string;
+    message: string;
+}
+
+export type OpenDialogOptions = OpenInputDialogOptions | OpenCreateTaskDialogOptions | OpenConfirmDialogOptions;
 
 export type OpenDialogResponse<T extends SimpleEventBusData> = {
     success: boolean;
     data?: T
+    error?: Error
 }
 
 export const createOpenDialog = (responseHandler: ResponseHandler) => {
     return async <T extends SimpleEventBusData>(options: OpenDialogOptions): Promise<OpenDialogResponse<T>> => {
-        const data = await responseHandler.requestResponse<DialogRequestRes<T>, DialogRequestReq<OpenDialogOptions>>(dialogRequestName, {
-            dialog: options
-        })
+        try {
+            const data = await responseHandler.requestResponse<DialogRequestRes<T>, DialogRequestReq<OpenDialogOptions>>(dialogRequestName, {
+                dialog: options
+            })
 
-        if (data) {
             return {
                 success: true,
                 data
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error
             }
-        }
-
-        return {
-            success: false,
-            data
         }
     }
 }

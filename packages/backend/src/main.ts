@@ -10,6 +10,7 @@ import './windows/dialog.window';
 import {taskFolderSettings} from "./settings/folders.settings";
 import {tasksSettings} from "./settings/tasks.setting";
 import './run-shell';
+import {resetAllSettings} from "./utils/resetAllSettings";
 // TODO: isolate-vm does not work with my version of Node...
 // import './run-javascript';
 
@@ -28,8 +29,7 @@ if (!isSingleInstance) {
         await tasksSettings.initialize();
 
         if (startupArguments.reset) {
-            await taskFolderSettings.resetSettings();
-            await tasksSettings.resetSettings();
+            await resetAllSettings();
         }
 
         // Windows

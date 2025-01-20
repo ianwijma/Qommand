@@ -20,14 +20,13 @@ type CreateDialogReturn<OP extends OpenParams, OR extends AnyObject> = {
     open: (params: OP) => Promise<OR>;
 }
 
-
 const createDialog = <OP extends OpenParams, OR extends AnyObject>({
                                                                        title,
                                                                        route
                                                                    }: CreateDialogParams): CreateDialogReturn<OP, OR> => {
     return {
         open: (options: OP): Promise<OR> => {
-            return new Promise<OR>(async (resolve) => {
+            return new Promise<OR>(async (resolve, reject) => {
                 const {open, destroy, initialize, getUniqueWindowId} = createWindow({
                     title,
                     route,
@@ -40,26 +39,29 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
 
                 await initialize();
 
-                const dialogId = getUniqueWindowId();
+                const currentWindowId = getUniqueWindowId();
 
-                const resolveButtonId = (buttonId: string): string => `${buttonId}::${dialogId}`
                 const stopListening = eventHandler.listen<ButtonClickedEventData>(buttonClickedEventName, (data) => {
-                    const {buttonId: currentButtonId, buttonData} = data;
+                    const {buttonId, windowId, buttonData} = data;
 
-                    switch (currentButtonId) {
-                        case resolveButtonId('cancel'): {
-                            resolve(buttonData as OR);
-                            stopListening();
-                            destroy();
+                    if (parseInt(windowId, 10) === currentWindowId) {
+                        switch (buttonId) {
+                            case 'confirm': {
+                                resolve(buttonData as OR);
+                                stopListening();
+                                destroy();
+                            }
+                                break;
+                            case 'cancel': {
+                                reject();
+                                stopListening();
+                                destroy();
+                            }
+                                break;
                         }
-                            break;
-                        case resolveButtonId('ok'): {
-                            resolve(buttonData as OR);
-                            stopListening();
-                            destroy();
-                        }
-                            break;
                     }
+
+
                 });
 
                 await open({urlParams: stringifyObject(options)});
@@ -93,9 +95,23 @@ export const createTaskDialog = createDialog<CreateTaskParams, CreateTaskReturn>
     route: 'dialog/create-task',
 });
 
+type ConfirmParams = {
+    title: string;
+    message: string;
+};
+type ConfirmReturn = {
+    confirmed: boolean;
+};
+
+export const confirmDialog = createDialog<ConfirmParams, ConfirmReturn>({
+    title: 'Confirm Dialog',
+    route: 'dialog/confirm',
+});
+
 const dialogMap = {
     input: inputDialog,
     'create-task': createTaskDialog,
+    'confirm': confirmDialog,
 }
 
 responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogRequestRes<SimpleEventBusData>>(dialogRequestName, () => true, async (data) => {

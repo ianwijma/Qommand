@@ -214,9 +214,12 @@ export const createWindow = ({
 
         await close();
 
-        stopListening();
+        // Stop existing listeners.
+        if (!!stopListening) {
+            stopListening();
 
-        stopListening = null;
+            stopListening = null;
+        }
 
         window.destroy();
     }

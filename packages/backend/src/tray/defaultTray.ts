@@ -4,6 +4,7 @@ import {sendWindow} from "../windows/send.window";
 import {taskWindow} from "../windows/task.window";
 import {isDev} from "../utils/isDev";
 import MenuItemConstructorOptions = Electron.MenuItemConstructorOptions;
+import {resetAllSettings} from "../utils/resetAllSettings";
 
 export const defaultTray = {
     async initialize() {
@@ -13,6 +14,14 @@ export const defaultTray = {
         tray.setToolTip('Qommand');
 
         let devItems: MenuItemConstructorOptions[] = [
+            {
+                type: 'separator',
+            },
+            {
+                label: 'Reset Settings',
+                type: 'normal',
+                click: () => resetAllSettings()
+            },
             {
                 label: 'Sending',
                 type: 'normal',

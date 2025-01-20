@@ -1,12 +1,13 @@
 'use client'
 
 import {useState} from "react";
-import {useOnButtonClicked} from "../../utils/emitButtonClick";
+import {useButtonClick} from "../../hooks/useButtonClick";
 
 export const Listen = () => {
     const [clicked, setClicked] = useState(false);
+    const {onButtonClicked} = useButtonClick();
 
-    useOnButtonClicked('super-special-state', () => {
+    onButtonClicked('super-special-state', () => {
         setClicked(true);
 
         setTimeout(() => setClicked(false), 1000);

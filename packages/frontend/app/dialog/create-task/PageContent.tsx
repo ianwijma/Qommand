@@ -1,14 +1,12 @@
 'use client'
 
 import {useRef} from "react";
-import {useSearchParams} from "next/navigation";
-import {emitButtonClick} from "../../../utils/emitButtonClick";
 import {SimpleEventBusData} from "@qommand/common/src/eventbus.types";
+import {useButtonClick} from "../../../hooks/useButtonClick";
 
 export const PageContent = () => {
+    const {emitButtonClick} = useButtonClick();
     const formRef = useRef<HTMLFormElement>(null);
-    const searchParams = useSearchParams();
-    const dialogId = searchParams.get('__id');
 
     const TaskTypes = {
         'javascript': "Javascript",
@@ -16,11 +14,11 @@ export const PageContent = () => {
         'noop': 'Blank',
     }
 
-    const handleCancel = () => emitButtonClick(`cancel::${dialogId}`);
-    const handleOk = () => {
+    const handleCancel = () => emitButtonClick('cancel');
+    const handleConfirm = () => {
         const form = formRef.current;
         const data: SimpleEventBusData = Object.fromEntries(new FormData(form)) as SimpleEventBusData;
-        emitButtonClick(`ok::${dialogId}`, data)
+        emitButtonClick('confirm', data)
     };
 
     return (
@@ -44,7 +42,7 @@ export const PageContent = () => {
                 }
             </div>
             <button onClick={handleCancel}>Cancel</button>
-            <button onClick={handleOk}>Ok</button>
+            <button onClick={handleConfirm}>Confirm</button>
         </form>
     )
 }
