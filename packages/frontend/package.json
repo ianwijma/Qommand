@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev  -p 3000 --turbopack",
     "build": "next build",
+    "build-quick": "next build --no-lint",
     "start": "next start -p 3000",
     "lint": "next lint"
   },

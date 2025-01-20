@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node bin/dev.js",
     "build": "node bin/build.js",
+    "build-quick": "node bin/build.js --quick",
     "reset": "node bin/reset.js"
   },
   "author": "Ian Wijma (https://ian.wij.ma/)",

@@ -1,5 +1,7 @@
 import 'zx/globals'
 
+const {quick} = argv;
+
 echo`~~~ Cleaning up previous build files...`
 await Promise.allSettled([
     $`rm -r packages/backend/.vite`,
@@ -8,8 +10,13 @@ await Promise.allSettled([
     $`rm -r packages/frontend/out`,
 ])
 
-echo`~~~ Build frontend...`
-await $`npm run build --workspace=packages/frontend`
+if (quick) {
+    echo`~~~ Build frontend quickly...`
+    await $`npm run build-quick --workspace=packages/frontend`
+} else {
+    echo`~~~ Build frontend...`
+    await $`npm run build --workspace=packages/frontend`
+}
 
 
 echo`~~~ Build backend...`
