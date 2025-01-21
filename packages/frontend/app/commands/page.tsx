@@ -3,7 +3,7 @@
 import {DefaultWindowContainer} from "../../components/windowContainer/DefaultWindowContainer";
 import {FunctionComponent, PropsWithChildren, useMemo, useState} from "react";
 import {useSettings} from "../../hooks/useSettings";
-import {FolderId, FolderSettings, SubFolders} from "@qommand/common/src/settings/folders.settings.types";
+import {Folder, FolderId, FolderSettings} from "@qommand/common/src/settings/folders.settings.types";
 import {CommandId, CommandSettings} from "@qommand/common/src/settings/commands.settings.types";
 import {createDialog} from "../../utils/createDialog";
 import {nanoid} from "nanoid";
@@ -19,12 +19,12 @@ const TableCell = ({children, className}: PropsWithChildren & { className?: stri
 
 type TableRow = {
     id: string,
-    CollapseElement: FunctionComponent,
-    name: string,
-    type: string,
-    alias: string,
-    hotkey: string,
-    ActionElement: FunctionComponent
+    CollapseEl: FunctionComponent,
+    NameEl: FunctionComponent,
+    TypeEl: FunctionComponent,
+    AliasEl: FunctionComponent,
+    HotkeyEl: FunctionComponent,
+    ActionEl: FunctionComponent
 }
 
 export default function CommandsPage() {
@@ -42,65 +42,24 @@ export default function CommandsPage() {
         updateSettings: updateFolderSettings
     } = useSettings<FolderSettings>('folder-commands');
 
+    const isLoading = isLoadingCommands || isLoadingFolder;
+
     const handleFolderUpdate = () => updateFolderSettings(folderSettings);
     const handleCommandUpdate = () => updateCommandsSettings(commandsSettings);
 
-    const isLoading = isLoadingCommands || isLoadingFolder;
+    const toggleFolder = (folderId: FolderId, collapsed: boolean) => {
+        folderSettings.subFolders[folderId].collapsed = collapsed;
 
-    const initialTableRows = useMemo<TableRow[]>(() => {
-        // TODO: Create table rows from folder & command settings.
-        // TODO: Use the same logic as below
-
-        return [];
-    }, [folderSettings, commandsSettings])
-
-    const filteredTableRows = useMemo<TableRow[]>(() => {
-        // TODO: Filter out table rows
-
-        return [];
-    }, [initialTableRows, query]);
-
-
-    if (isLoading) {
-        return <div>Loading...</div>;
+        handleFolderUpdate()
     }
 
-    const {subFolders} = folderSettings;
-    const {commands} = commandsSettings;
+    const toggleCommand = (commandId: CommandId, checked: boolean) => {
+        commandsSettings.commands[commandId].enabled = checked;
 
-    const createCategory = async () => {
-        if (!creating) {
-            setCreating(true);
-            const {success, data} = await createDialog<{ input: string }>({
-                type: 'input',
-                message: 'Give folder name',
-                title: 'Give folder name',
-            });
-
-            setCreating(false);
-
-            if (success) {
-                const {input} = data;
-                const title = input.trim();
-
-                if (title) {
-                    const newFolderId: FolderId = nanoid();
-
-                    subFolders[newFolderId] = {
-                        id: newFolderId,
-                        collapsed: false,
-                        name: input.trim(),
-                        subFolders: {},
-                        targetId: null
-                    }
-
-                    handleFolderUpdate();
-                }
-            }
-        }
+        handleCommandUpdate();
     }
 
-    const createCommand = async (subSubFolders: SubFolders) => {
+    const createCommand = async (folder: Folder) => {
         if (!creating) {
             setCreating(true);
             const {success, data} = await createDialog<{ name: string, type: 'shell' | 'script' }>({
@@ -130,7 +89,8 @@ export default function CommandsPage() {
 
                     handleCommandUpdate();
 
-                    subSubFolders[newFolderId] = {
+                    folder.collapsed = false;
+                    folder.subFolders[newFolderId] = {
                         id: newFolderId,
                         collapsed: false,
                         name,
@@ -144,16 +104,109 @@ export default function CommandsPage() {
         }
     };
 
-    const toggleFolder = (folderId: FolderId, collapsed: boolean) => {
-        subFolders[folderId].collapsed = collapsed;
+    const createCategory = async () => {
+        if (!creating) {
+            setCreating(true);
+            const {success, data} = await createDialog<{ input: string }>({
+                type: 'input',
+                message: 'Give folder name',
+                title: 'Give folder name',
+            });
 
-        handleFolderUpdate()
+            setCreating(false);
+
+            if (success) {
+                const {input} = data;
+                const title = input.trim();
+
+                if (title) {
+                    const newFolderId: FolderId = nanoid();
+
+                    folderSettings.subFolders[newFolderId] = {
+                        id: newFolderId,
+                        collapsed: false,
+                        name: input.trim(),
+                        subFolders: {},
+                        targetId: null
+                    }
+
+                    handleFolderUpdate();
+                }
+            }
+        }
     }
 
-    const toggleCommand = (commandId: CommandId, checked: boolean) => {
-        commands[commandId].enabled = checked;
+    const tableRows = useMemo<TableRow[]>(() => {
+        const rows: TableRow[] = [];
 
-        handleCommandUpdate();
+        if (isLoading) {
+            return [];
+        }
+
+        const {subFolders: folders} = folderSettings;
+        const {commands} = commandsSettings;
+
+        for (const folderId in folders) {
+            // Get current folder and it's data
+            const folder = folders[folderId];
+            const {id: subFolderId, name: subFolderName, subFolders, collapsed} = folder;
+
+            // Get the current folders commands
+            const targetIds = Object.values(subFolders).map(({targetId}) => targetId);
+            const targetCommands = targetIds.map((targetId) => commands[targetId]);
+            const hasCommands = targetCommands.length > 0;
+
+            // Add the folder first
+            rows.push({
+                id: subFolderId,
+                CollapseEl: () => hasCommands ? (
+                    <button onClick={() => toggleFolder(folderId, !collapsed)}>
+                        {collapsed ? '⇓' : '⇐'}
+                    </button>
+                ) : '',
+                NameEl: () => `${hasCommands ? (collapsed ? '═' : '╔') : ''} ${subFolderName}`,
+                TypeEl: () => 'Category',
+                AliasEl: () => '--',
+                HotkeyEl: () => '--',
+                ActionEl: () => <button onClick={() => createCommand(folder)}>+</button>
+            })
+
+            if (!collapsed) {
+                targetCommands.forEach((targetCommand, index) => {
+                    const isLast = (Object.keys(targetCommands).length - 1) === index;
+
+                    const {
+                        id: commandId,
+                        name: commandName,
+                        type: commandType,
+                        aliases,
+                        hotkey,
+                        enabled
+                    } = targetCommand;
+
+                    rows.push({
+                        id: commandId,
+                        CollapseEl: () => '',
+                        NameEl: () => `${isLast ? '╚' : '╠'} ${commandName}`,
+                        TypeEl: () => commandType,
+                        AliasEl: () => aliases.join(', '),
+                        HotkeyEl: () => hotkey,
+                        ActionEl: () => (
+                            <input checked={enabled}
+                                   onChange={({currentTarget: {checked}}) => toggleCommand(commandId, checked)}
+                                   type='checkbox'/>
+                        )
+                    })
+                });
+            }
+        }
+
+        return rows;
+    }, [folderSettings, commandsSettings, query, isLoading]);
+
+
+    if (isLoading) {
+        return <div>Loading...</div>;
     }
 
     return <DefaultWindowContainer title='Qommands'>
@@ -181,68 +234,30 @@ export default function CommandsPage() {
                 </tr>
                 </thead>
                 <tbody>
-                {filteredTableRows.map(({id, CollapseElement, name, type, alias, hotkey, ActionElement}) => (
-                    <tr key={id}>
-                        <TableCell>
-                            <CollapseElement/>
-                        </TableCell>
-                        <TableCell>{name}</TableCell>
-                        <TableCell>{type}</TableCell>
-                        <TableCell>{alias}</TableCell>
-                        <TableCell>{hotkey}</TableCell>
-                        <TableCell>
-                            <ActionElement/>
-                        </TableCell>
-                    </tr>
-                ))}
-                {Object.values(subFolders).map(({
-                                                    id: folderId,
-                                                    name: folderName,
-                                                    subFolders: subSubFolders,
-                                                    collapsed
-                                                }) => (
-                    <>
-                        <tr key={folderId}>
+                {tableRows.map(({id, CollapseEl, NameEl, TypeEl, AliasEl, HotkeyEl, ActionEl}) => {
+                    return (
+                        <tr key={id}>
                             <TableCell>
-                                <button onClick={() => toggleFolder(folderId, !collapsed)}>
-                                    {collapsed ? '+' : '-'}
-                                </button>
+                                <CollapseEl/>
                             </TableCell>
-                            <TableCell>{folderName}</TableCell>
-                            <TableCell>Category</TableCell>
-                            <TableCell>--</TableCell>
-                            <TableCell>--</TableCell>
                             <TableCell>
-                                <button onClick={() => createCommand(subSubFolders)}>+</button>
+                                <NameEl/>
+                            </TableCell>
+                            <TableCell>
+                                <TypeEl/>
+                            </TableCell>
+                            <TableCell>
+                                <AliasEl/>
+                            </TableCell>
+                            <TableCell>
+                                <HotkeyEl/>
+                            </TableCell>
+                            <TableCell>
+                                <ActionEl/>
                             </TableCell>
                         </tr>
-                        {!collapsed ? Object.values(subSubFolders).map(({targetId}, index) => {
-                            const {id: commandId, name: commandName, type, aliases, hotkey} = commands[targetId];
-                            const isLast = (Object.keys(subSubFolders).length - 1) === index;
-
-                            let {enabled} = commands[targetId];
-
-                            return (
-                                <tr key={commandId}>
-                                    <TableCell></TableCell>
-                                    <TableCell>
-                                        {isLast ? '└' : '├'}
-                                        {' '}
-                                        {commandName}
-                                    </TableCell>
-                                    <TableCell>{type}</TableCell>
-                                    <TableCell>{aliases.join(', ')}</TableCell>
-                                    <TableCell>{hotkey}</TableCell>
-                                    <TableCell>
-                                        <input checked={enabled}
-                                               onChange={({currentTarget: {checked}}) => toggleCommand(commandId, checked)}
-                                               type='checkbox'/>
-                                    </TableCell>
-                                </tr>
-                            )
-                        }) : ''}
-                    </>
-                ))}
+                    )
+                })}
                 <tr></tr>
                 </tbody>
             </table>
