@@ -145,35 +145,55 @@ export default function CommandsPage() {
 
         const {subFolders: folders} = folderSettings;
         const {commands} = commandsSettings;
+        const searchQuery = query.trim().toLowerCase();
+        const isSearching = searchQuery.length > 0;
 
         for (const folderId in folders) {
             // Get current folder and it's data
             const folder = folders[folderId];
-            const {id: subFolderId, name: subFolderName, subFolders, collapsed} = folder;
+            const {name: folderName, subFolders, collapsed} = folder;
+            const isCollapsed = isSearching ? false : collapsed;
 
             // Get the current folders commands
             const targetIds = Object.values(subFolders).map(({targetId}) => targetId);
             const targetCommands = targetIds.map((targetId) => commands[targetId]);
             const hasCommands = targetCommands.length > 0;
 
-            // Add the folder first
-            rows.push({
-                id: subFolderId,
-                CollapseEl: () => hasCommands ? (
-                    <button onClick={() => toggleFolder(folderId, !collapsed)}>
-                        {collapsed ? '⇓' : '⇐'}
-                    </button>
-                ) : '',
-                NameEl: () => `${hasCommands ? (collapsed ? '═' : '╔') : ''} ${subFolderName}`,
-                TypeEl: () => 'Category',
-                AliasEl: () => '--',
-                HotkeyEl: () => '--',
-                ActionEl: () => <button onClick={() => createCommand(folder)}>+</button>
-            })
+            // filter commands
+            const filteredTargetCommands = targetCommands.filter(({name}) => name.toLowerCase().includes(searchQuery));
+            const hasFilteredCommands = filteredTargetCommands.length > 0;
 
-            if (!collapsed) {
-                targetCommands.forEach((targetCommand, index) => {
-                    const isLast = (Object.keys(targetCommands).length - 1) === index;
+            // Filter folder
+            const pushFolder = isSearching && folderName.toLowerCase().includes(searchQuery) || hasFilteredCommands;
+
+            // Add the folder first
+            if (pushFolder) {
+                rows.push({
+                    id: folderId,
+                    CollapseEl: () => {
+                        if (isSearching) {
+                            return '⇐';
+                        }
+
+                        if (hasFilteredCommands) {
+                            return <button onClick={() => toggleFolder(folderId, !isCollapsed)}>
+                                {isCollapsed ? '⇓' : '⇐'}
+                            </button>
+                        }
+
+                        return '';
+                    },
+                    NameEl: () => `${hasCommands ? (collapsed ? '═' : '╔') : ''} ${folderName}`,
+                    TypeEl: () => 'Category',
+                    AliasEl: () => '--',
+                    HotkeyEl: () => '--',
+                    ActionEl: () => <button onClick={() => createCommand(folder)}>+</button>
+                })
+            }
+
+            if (!isCollapsed) {
+                filteredTargetCommands.forEach((targetCommand, index) => {
+                    const isLast = (Object.keys(filteredTargetCommands).length - 1) === index;
 
                     const {
                         id: commandId,
@@ -218,6 +238,7 @@ export default function CommandsPage() {
                 placeholder='Search for Qommands'
                 className='text-black w-full'
             />
+            <button className='whitespace-nowrap' onClick={() => setQuery('')}>Clear Search</button>
             <button className='whitespace-nowrap' onClick={createCategory}>Add category</button>
         </div>
 
