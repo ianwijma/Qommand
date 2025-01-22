@@ -53,6 +53,7 @@ export const createWindow = ({
 
     const isInitialized = () => {
         if (!window) throw new Error("Window was not initialized");
+        if (window.isDestroyed()) throw new Error("Window was destroyed");
     }
 
     const getWindow = () => {

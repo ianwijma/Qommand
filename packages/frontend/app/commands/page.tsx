@@ -1,10 +1,10 @@
 'use client';
 
 import {DefaultWindowContainer} from "../../components/windowContainer/DefaultWindowContainer";
-import {FunctionComponent, PropsWithChildren, useMemo, useState} from "react";
+import {FunctionComponent, PropsWithChildren, useCallback, useMemo, useState} from "react";
 import {useSettings} from "../../hooks/useSettings";
 import {Folder, FolderId, FolderSettings} from "@qommand/common/src/settings/folders.settings.types";
-import {CommandId, CommandSettings} from "@qommand/common/src/settings/commands.settings.types";
+import {CommandId, Commands, CommandSettings} from "@qommand/common/src/settings/commands.settings.types";
 import {createDialog} from "../../utils/createDialog";
 import {nanoid} from "nanoid";
 
@@ -29,7 +29,14 @@ type TableRow = {
 
 export default function CommandsPage() {
     const [query, setQuery] = useState('');
-    const [creating, setCreating] = useState(false);
+    const [openState, setOpenState] = useState<Record<string, boolean>>({});
+    const isOpenState = useCallback((key: string) => !!openState[key], [openState]);
+    const updateOpenState = (key: string, open: boolean) => {
+        setOpenState({
+            ...openState,
+            [key]: open
+        })
+    }
 
     const {
         isLoading: isLoadingCommands,
@@ -59,14 +66,63 @@ export default function CommandsPage() {
         handleCommandUpdate();
     }
 
+    const editFolder = async (folderId: FolderId) => {
+        if (!isOpenState('edit-folder')) {
+            updateOpenState('edit-folder', true);
+
+            const {success, data} = await createDialog<{ input: string }>({
+                type: 'input',
+                message: 'Give folder name',
+                title: 'Give folder name',
+                value: folderSettings.subFolders[folderId].name
+            });
+
+            updateOpenState('edit-folder', false);
+
+            if (success) {
+                const {input} = data;
+                const title = input.trim();
+
+                if (title) {
+                    folderSettings.subFolders[folderId].name = title;
+                }
+
+                handleFolderUpdate();
+            }
+        }
+    }
+
+    const editCommand = useCallback(async (command: Commands) => {
+        const {id: commandId, name} = command;
+
+        const openStateKey = `edit-command-${commandId}`;
+
+        debugger;
+
+        if (!isOpenState(openStateKey)) {
+            updateOpenState(openStateKey, true);
+
+            await createDialog<{}>({
+                type: 'edit-command',
+                title: `Edit ${name}`,
+                commandId
+            });
+
+            debugger;
+
+            updateOpenState(openStateKey, false);
+        }
+    }, [isOpenState])
+
     const createCommand = async (folder: Folder) => {
-        if (!creating) {
-            setCreating(true);
+        if (!isOpenState('create-command')) {
+            updateOpenState('create-command', true);
+
             const {success, data} = await createDialog<{ name: string, type: 'shell' | 'script' }>({
                 type: 'create-command',
             });
 
-            setCreating(false);
+            updateOpenState('create-command', false);
 
             if (success) {
                 const {name: input, type} = data;
@@ -105,15 +161,16 @@ export default function CommandsPage() {
     };
 
     const createCategory = async () => {
-        if (!creating) {
-            setCreating(true);
+        if (!isOpenState('create-category')) {
+            updateOpenState('create-category', true);
+
             const {success, data} = await createDialog<{ input: string }>({
                 type: 'input',
                 message: 'Give folder name',
                 title: 'Give folder name',
             });
 
-            setCreating(false);
+            updateOpenState('create-category', false);
 
             if (success) {
                 const {input} = data;
@@ -183,7 +240,20 @@ export default function CommandsPage() {
 
                         return '';
                     },
-                    NameEl: () => `${hasCommands ? (collapsed ? '═' : '╔') : ''} ${folderName}`,
+                    NameEl: () => {
+                        return (
+                            <>
+                                {hasCommands ? (collapsed ? '═' : '╔') : ''}
+                                {' '}
+                                <button
+                                    onClick={() => editFolder(folderId)}
+                                    className='underline'
+                                >
+                                    {folderName}
+                                </button>
+                            </>
+                        )
+                    },
                     TypeEl: () => 'Category',
                     AliasEl: () => '--',
                     HotkeyEl: () => '--',
@@ -207,7 +277,21 @@ export default function CommandsPage() {
                     rows.push({
                         id: commandId,
                         CollapseEl: () => '',
-                        NameEl: () => `${isLast ? '╚' : '╠'} ${commandName}`,
+                        NameEl: () => {
+
+                            return (
+                                <>
+                                    {isLast ? '╚' : '╠'}
+                                    {' '}
+                                    <button
+                                        onClick={() => editCommand(targetCommand)}
+                                        className='underline'
+                                    >
+                                        {commandName}
+                                    </button>
+                                </>
+                            )
+                        },
                         TypeEl: () => commandType,
                         AliasEl: () => aliases.join(', '),
                         HotkeyEl: () => hotkey,

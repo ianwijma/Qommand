@@ -27,7 +27,7 @@ export const TitleBar = ({children, showMinimize = true, showClose = true}: Titl
     return <div id='title-bar' className='flex justify-between bg-slate-800 px-1 py-1'>
         <div className='flex items-center gap-1'>
             <img src={defaultLogo} alt='logo' className='w-5 h-5'/>
-            <span className='max-w-[100px] flex overflow-ellipsis overflow-hidden'>
+            <span className='max-w-1/2 flex overflow-ellipsis overflow-hidden whitespace-nowrap'>
                 {children}
             </span>
         </div>

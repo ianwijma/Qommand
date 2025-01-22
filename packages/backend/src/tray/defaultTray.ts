@@ -1,7 +1,6 @@
 import {app, Menu, nativeImage, Tray} from "electron";
 import {receiveWindow} from "../windows/receive.window";
 import {sendWindow} from "../windows/send.window";
-import {taskWindow} from "../windows/task.window";
 import {isDev} from "../utils/isDev";
 import MenuItemConstructorOptions = Electron.MenuItemConstructorOptions;
 import {resetAllSettings} from "../utils/resetAllSettings";
@@ -41,11 +40,6 @@ export const defaultTray = {
                 label: 'Qommands',
                 type: 'normal',
                 click: () => commandsWindow.open()
-            },
-            {
-                label: 'Open Qommand Tasks',
-                type: 'normal',
-                click: () => taskWindow.open()
             },
             ...isDev() ? devItems : [],
             {

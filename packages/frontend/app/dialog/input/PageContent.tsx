@@ -9,7 +9,8 @@ export const PageContent = () => {
     const ref = useRef<HTMLInputElement>(null);
     const searchParams = useSearchParams();
     const message = searchParams.get('message');
-    const inputPlaceholder = searchParams.get('inputPlaceholder');
+    const placeholder = searchParams.get('placeholder') ?? '';
+    const value = searchParams.get('value') ?? '';
 
     const handleCancel = () => emitButtonClick('cancel');
     const handleConfirm = () => emitButtonClick('confirm', {input: ref.current.value});
@@ -19,7 +20,7 @@ export const PageContent = () => {
             <span>
                 {message}
             </span>
-            <input ref={ref} placeholder={inputPlaceholder} className='text-black'/>
+            <input ref={ref} placeholder={placeholder} className='text-black' defaultValue={value}/>
             <button onClick={handleCancel}>Cancel</button>
             <button onClick={handleConfirm}>Confirm</button>
         </>

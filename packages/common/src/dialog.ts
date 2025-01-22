@@ -6,6 +6,8 @@ type OpenInputDialogOptions = {
     type: 'input';
     title: string;
     message: string;
+    placeholder?: string;
+    value?: string;
 }
 
 type OpenCreateTaskDialogOptions = {
@@ -22,11 +24,18 @@ type OpenConfirmDialogOptions = {
     message: string;
 }
 
+type EditCommandDialogOptions = {
+    type: 'edit-command';
+    title: string;
+    commandId: string;
+}
+
 export type OpenDialogOptions =
     OpenInputDialogOptions
     | OpenCreateTaskDialogOptions
     | OpenCreateCommandDialogOptions
-    | OpenConfirmDialogOptions;
+    | OpenConfirmDialogOptions
+    | EditCommandDialogOptions;
 
 export type OpenDialogResponse<T extends SimpleEventBusData> = {
     success: boolean;

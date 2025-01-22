@@ -13,6 +13,11 @@ import {eventHandler} from "../utils/eventHandler";
 type CreateDialogParams = {
     title: string;
     route: string;
+    resizable?: boolean,
+    width?: number,
+    height?: number,
+    minWidth?: number,
+    minHeight?: number,
 }
 
 type OpenParams = AnyObject<string, string>;
@@ -22,7 +27,12 @@ type CreateDialogReturn<OP extends OpenParams, OR extends AnyObject> = {
 
 const createDialog = <OP extends OpenParams, OR extends AnyObject>({
                                                                        title,
-                                                                       route
+                                                                       route,
+                                                                       resizable = false,
+                                                                       width = 512,
+                                                                       height = 256,
+                                                                       minWidth = 512,
+                                                                       minHeight = 256,
                                                                    }: CreateDialogParams): CreateDialogReturn<OP, OR> => {
     return {
         open: (options: OP): Promise<OR> => {
@@ -30,11 +40,11 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
                 const {open, destroy, initialize, getUniqueWindowId} = createWindow({
                     title,
                     route,
-                    resizable: false,
-                    width: 512,
-                    height: 256,
-                    minWidth: 512,
-                    minHeight: 256,
+                    resizable,
+                    width,
+                    height,
+                    minWidth,
+                    minHeight,
                 });
 
                 await initialize();
@@ -73,7 +83,8 @@ const createDialog = <OP extends OpenParams, OR extends AnyObject>({
 type SimpleInputParams = {
     title: string;
     message: string;
-    inputPlaceholder?: string
+    placeholder?: string
+    value?: string
 };
 type SimpleInputReturn = {
     input: string
@@ -119,11 +130,28 @@ export const confirmDialog = createDialog<ConfirmParams, ConfirmReturn>({
     route: 'dialog/confirm',
 });
 
+type EditCommandParams = {
+    commandId: string;
+    title: string;
+};
+type EditCommandReturn = {};
+
+export const editCommandDialog = createDialog<EditCommandParams, EditCommandReturn>({
+    title: 'Edit Command',
+    route: 'dialog/edit-command',
+    resizable: true,
+    width: 1080,
+    height: 700,
+    minWidth: 1080,
+    minHeight: 700,
+});
+
 const dialogMap = {
     input: inputDialog,
     'create-task': createTaskDialog,
     'create-command': createCommandDialog,
     'confirm': confirmDialog,
+    'edit-command': editCommandDialog,
 }
 
 responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogRequestRes<SimpleEventBusData>>(dialogRequestName, () => true, async (data) => {
@@ -132,6 +160,7 @@ responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogReques
 
     if (type in dialogMap) {
         const dialogHandler = dialogMap[type];
+
         // @ts-expect-error - rest can be either createTaskDialog of inputDialog, which makes rest unhappy.
         return dialogHandler.open(rest)
     }

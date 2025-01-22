@@ -1,7 +1,7 @@
 import IpcRendererEvent = Electron.IpcRendererEvent;
 
 // Needs to be required for some reason?
-const {contextBridge, ipcRenderer} = require('electron/renderer');
+const {contextBridge, ipcRenderer, webUtils} = require('electron/renderer');
 
 import {SimpleEventBusData, SimpleEventBus} from "@qommand/common/src/eventbus.types";
 
@@ -44,3 +44,6 @@ contextBridge.exposeInMainWorld('eventBusApi', {
     },
 } as SimpleEventBus)
 
+contextBridge.exposeInMainWorld('filesApi', {
+    getPathForFile: (file: File) => webUtils.getPathForFile(file)
+})
