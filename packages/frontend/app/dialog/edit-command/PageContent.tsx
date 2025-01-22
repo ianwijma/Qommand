@@ -1,15 +1,15 @@
 'use client'
 
-import {useEffect, useRef} from "react";
+import {useEffect} from "react";
 import {useSettings} from "../../../hooks/useSettings";
 import {Commands, CommandSettings} from "@qommand/common/src/settings/commands.settings.types";
+import {recursiveMerge} from "@qommand/common/src/object";
 import {useSearchParams} from "next/navigation";
 import {getPathForFile} from "../../../utils/files";
 import {useButtonClick} from "../../../hooks/useButtonClick";
 
 export const PageContent = () => {
     const {emitButtonClick} = useButtonClick();
-    const formRef = useRef<HTMLFormElement>(null);
 
     const searchParams = useSearchParams();
     const commandId = searchParams.get('commandId');
@@ -20,16 +20,18 @@ export const PageContent = () => {
     const {commands = {}} = settings ?? {};
     const command = commands[commandId];
     const updateCommand = (updatedFields: Partial<Commands>) => {
-        Object.keys(updatedFields).forEach((key: string) => {
-            command[key] = updatedFields[key];
-        });
+        console.log('pre-update', commands[commandId], updatedFields);
+
+        commands[commandId] = recursiveMerge<Commands>(commands[commandId], updatedFields)
+
+        console.log('post-update', commands[commandId]);
 
         handleUpdate();
     }
 
     useEffect(() => console.log('Command updated', command), [command]);
 
-    if (isLoading) return <div>Loading...</div>
+    if (isLoading || !command) return <div>Loading...</div>
 
     const CommandConfig = () => {
         switch (command.type) {
@@ -39,19 +41,33 @@ export const PageContent = () => {
                         <label htmlFor='file'>
                             File
                         </label>
-                        <input
-                            id='file'
-                            name='file'
-                            placeholder='Command Script'
-                            type='file'
-                            className='text-black'
-                            // currentTarget.checkValidity() does not allow empty fields :/
-                            onChange={({currentTarget}) => currentTarget.checkValidity() && updateCommand({
-                                commandConfig: {
-                                    path: getPathForFile(currentTarget.files[0]),
-                                }
-                            })}
-                        />
+                        {
+                            command.commandConfig.path ? (
+                                <div className='flex justify-between gap-2'>
+                                    <input defaultValue={command.commandConfig.path as string}
+                                           id='file'
+                                           name='file'
+                                           readOnly
+                                           disabled
+                                           className='text-black w-full'/>
+                                    <button onClick={() => updateCommand({commandConfig: {path: ''}})}>unset</button>
+                                </div>
+                            ) : (
+                                <input
+                                    id='file'
+                                    name='file'
+                                    placeholder='Command Script'
+                                    type='file'
+                                    className='text-black w-full'
+                                    // currentTarget.checkValidity() does not allow empty fields :/
+                                    onChange={({currentTarget}) => currentTarget.checkValidity() && updateCommand({
+                                        commandConfig: {
+                                            path: getPathForFile(currentTarget.files[0]),
+                                        }
+                                    })}
+                                />
+                            )
+                        }
                         <hr/>
                     </>
                 )
@@ -81,7 +97,7 @@ export const PageContent = () => {
     }
 
     return (
-        <form ref={formRef} className="flex flex-col gap-3">
+        <form className="flex flex-col gap-3">
             <label htmlFor='name'>
                 Name
             </label>

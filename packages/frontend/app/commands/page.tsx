@@ -95,19 +95,11 @@ export default function CommandsPage() {
     const editCommand = async (command: Commands) => {
         const {id: commandId, name} = command;
 
-        const openStateKey = `edit-command-${commandId}`;
-
-        if (!isOpenState(openStateKey)) {
-            updateOpenState(openStateKey, true);
-
-            await createDialog<{}>({
-                type: 'edit-command',
-                title: `Edit ${name}`,
-                commandId
-            });
-
-            updateOpenState(openStateKey, false);
-        }
+        await createDialog<{}>({
+            type: 'edit-command',
+            title: `Edit ${name}`,
+            commandId
+        });
     };
 
     const createCommand = async (folder: Folder) => {
@@ -217,14 +209,17 @@ export default function CommandsPage() {
             const hasFilteredCommands = filteredTargetCommands.length > 0;
 
             // Filter folder
-            const pushFolder = isSearching && folderName.toLowerCase().includes(searchQuery) || hasFilteredCommands;
+            let pushFolder = true;
+            if (isSearching && !folderName.toLowerCase().includes(searchQuery) && !hasFilteredCommands) {
+                pushFolder = false;
+            }
 
             // Add the folder first
             if (pushFolder) {
                 rows.push({
                     id: folderId,
                     CollapseEl: () => {
-                        if (isSearching) {
+                        if (isSearching && hasCommands) {
                             return '⇐';
                         }
 

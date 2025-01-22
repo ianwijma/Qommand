@@ -66,6 +66,7 @@ export const createSettings = <T extends BaseSettings>({
 
         const updatedSettings = getSettings();
 
+        console.log('Settings updated', {name, settings: JSON.stringify(updatedSettings)});
         eventHandler.emit<SettingsUpdatedEventData<T>>(settingsUpdatedEventName, {
             settingName: name,
             updatedSettings,
@@ -80,15 +81,16 @@ export const createSettings = <T extends BaseSettings>({
 
         await syncSettings();
 
-        const resetSettings = getSettings();
+        const resettedSettings = getSettings();
 
+        console.log('Settings reset', {name, settings: JSON.stringify(resettedSettings)});
         eventHandler.emit<SettingsUpdatedEventData<T>>(settingsUpdatedEventName, {
             settingName: name,
-            updatedSettings: resetSettings,
+            updatedSettings: resettedSettings,
             type: 'reset'
         });
 
-        return resetSettings;
+        return resettedSettings;
     }
 
     responseHandler.handleResponse<SettingsRequestReq, SettingsRequestRes<T>>(settingsRequestName, (request) => {

@@ -7,6 +7,7 @@ import {eventHandler} from "../utils/eventHandler";
 import {closeWindowEventName, type CloseWindowEventData} from '@qommand/common/src/events/closeWindow.event';
 import {minimizeWindowEventName, type MinimizeWindowEventData} from '@qommand/common/src/events/minimizeWindow.event';
 import {StopListening} from "@qommand/common/src/eventbus.types";
+import {sleep} from "../utils/sleep";
 
 type UrlParams = Record<string, string>;
 
@@ -70,6 +71,9 @@ export const createWindow = ({
             title: `${title} Dev Tools`,
             activate: true,
         });
+
+        // Give the devtools some time to open...
+        await sleep(500);
     }
     const closeDevTools = async () => {
         isInitialized();
@@ -144,6 +148,9 @@ export const createWindow = ({
     const open = async ({urlParams}: OpenParams = {}) => {
         isInitialized();
 
+        // Always trigger, ensure the dev tools are open
+        if (isDev() || startupArguments.dev) await openDevTools();
+
         const url = getUrl();
         const hash = getHash({urlParams});
         const search = new URLSearchParams(hash).toString();
@@ -172,9 +179,6 @@ export const createWindow = ({
                 moveWindowToCursorScreen();
             }
         }
-
-        // Always trigger, ensure the dev tools are open
-        if (isDev() || startupArguments.dev) await openDevTools();
     }
 
     const initializeWindowEvents = () => {
