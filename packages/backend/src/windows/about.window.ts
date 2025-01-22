@@ -3,8 +3,8 @@ import {createWindow} from "./createWindow";
 export const aboutWindow = createWindow({
     title: 'About Qommand',
     route: 'about',
-    width: 420,
+    width: 690,
     height: 180,
-    minWidth: 420,
+    minWidth: 690,
     minHeight: 180,
 });
