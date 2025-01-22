@@ -13,6 +13,7 @@ import './run-shell';
 import {resetAllSettings} from "./utils/resetAllSettings";
 import {commandsWindow} from "./windows/commands.window";
 import {commandsSettings} from "./settings/commands.setting";
+import {aboutWindow} from "./windows/about.window";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -43,9 +44,10 @@ if (!isSingleInstance) {
 
         // Windows
         await commandsWindow.initialize();
-        await taskWindow.initialize();
+        await aboutWindow.initialize();
 
         if (isDev()) {
+            await taskWindow.initialize();
             await receiveWindow.initialize();
             await sendWindow.initialize();
         }

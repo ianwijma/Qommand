@@ -6,6 +6,7 @@ import MenuItemConstructorOptions = Electron.MenuItemConstructorOptions;
 import {resetAllSettings} from "../utils/resetAllSettings";
 import {commandsWindow} from "../windows/commands.window";
 import {defaultLogo} from '@qommand/common/src/logos'
+import {aboutWindow} from "../windows/about.window";
 
 export const defaultTray = {
     async initialize() {
@@ -40,6 +41,11 @@ export const defaultTray = {
                 label: 'Qommands',
                 type: 'normal',
                 click: () => commandsWindow.open()
+            },
+            {
+                label: 'About',
+                type: 'normal',
+                click: () => aboutWindow.open()
             },
             ...isDev() ? devItems : [],
             {
