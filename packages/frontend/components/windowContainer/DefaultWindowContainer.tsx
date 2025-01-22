@@ -16,7 +16,7 @@ export const DefaultWindowContainer = ({children, title, showMinimize, showClose
             <title>{title}</title>
         </Head>
         <TitleBar {...{showMinimize, showClose}}>{title}</TitleBar>
-        <div className='flex flex-col bg-slate-700 h-full py-1 px-1 overflow-x-auto'>
+        <div className='flex flex-col bg-slate-700 h-full py-1 px-1 overflow-x-auto whitespace-nowrap'>
             {children}
         </div>
     </div>
