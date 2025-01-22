@@ -2,6 +2,7 @@ import {SimpleEventBusData, SimpleEventBus} from "@qommand/common/src/eventbus.t
 import EventEmitter from 'node:events'
 
 const bus = new EventEmitter();
+bus.setMaxListeners(0);
 
 const EVENT_NAME = 'event-bus';
 
