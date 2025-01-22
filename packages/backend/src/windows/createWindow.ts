@@ -1,4 +1,4 @@
-import {BrowserWindow, screen} from "electron";
+import {app, BrowserWindow, screen} from "electron";
 import path from "path";
 import {isDev} from "../utils/isDev";
 import {startupArguments} from "../utils/startupArguments";
@@ -177,6 +177,20 @@ export const createWindow = ({
         if (isDev() || startupArguments.dev) await openDevTools();
     }
 
+    const initializeWindowEvents = () => {
+        isInitialized();
+
+        window.on('close', (event) => {
+            // @ts-expect-error - isQuiting is not officially defined.
+            if (!app.isQuiting) {
+                event.preventDefault();
+                close();
+            }
+
+            return false;
+        })
+    }
+
     const initializeEventBus = () => {
         isInitialized();
 
@@ -194,7 +208,7 @@ export const createWindow = ({
         });
     }
 
-    const initializeWindowEventListeners = () => {
+    const initializeWindowActions = () => {
         const isCurrentWindow = ({windowId}: { windowId: number }) => windowId === window.id;
 
         eventHandler.listen<CloseWindowEventData>(closeWindowEventName, (data) => {
@@ -245,9 +259,9 @@ export const createWindow = ({
 
         loadWindowPromise = loadWindow({urlParams: defaultUrlParams});
 
+        initializeWindowEvents();
         initializeEventBus();
-        initializeWindowEventListeners();
-        // initializeEventListeners();
+        initializeWindowActions();
     }
 
     const getUniqueWindowId = () => {

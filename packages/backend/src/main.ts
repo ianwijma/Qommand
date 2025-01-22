@@ -25,6 +25,13 @@ let isSingleInstance = app.requestSingleInstanceLock()
 if (!isSingleInstance) {
     app.quit();
 } else {
+    const onBeforeQuit = () => {
+        // @ts-expect-error - isQuiting is not officially defined.
+        app.isQuiting = true;
+    }
+
+    app.on('before-quit', onBeforeQuit);
+
     const onReady = async () => {
         // Settings
         await taskFolderSettings.initialize();

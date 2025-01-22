@@ -92,12 +92,10 @@ export default function CommandsPage() {
         }
     }
 
-    const editCommand = useCallback(async (command: Commands) => {
+    const editCommand = async (command: Commands) => {
         const {id: commandId, name} = command;
 
         const openStateKey = `edit-command-${commandId}`;
-
-        debugger;
 
         if (!isOpenState(openStateKey)) {
             updateOpenState(openStateKey, true);
@@ -108,11 +106,9 @@ export default function CommandsPage() {
                 commandId
             });
 
-            debugger;
-
             updateOpenState(openStateKey, false);
         }
-    }, [isOpenState])
+    };
 
     const createCommand = async (folder: Folder) => {
         if (!isOpenState('create-command')) {
