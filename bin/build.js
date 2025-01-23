@@ -30,21 +30,19 @@ try {
         await $`npm run build --workspace=packages/frontend`
     }
 
+    // Ensure the frontend build ends up in the backend build output folder.
+    const feInterval = setInterval(async () => {
+        if (!fs.existsSync('packages/backend/.vite/renderer/the_window/')) {
+            echo`~~~ Copy compiled frontend packages into the backend renderer build folder...`
+            await $`mkdir -p packages/backend/.vite/renderer/the_window/`
+            await $`cp -r  packages/backend/.vite/renderer/the_window/`;
+        }
+    }, 50)
 
     echo`~~~ Build backend...`
-    const buildPromise = $`npm run make --workspace=packages/backend`;
+    await $`npm run make --workspace=packages/backend`;
 
-    // TODO: Replace with waiting logic for packages/backend/.vite/renderer/incorrect_window, replacing it with the_window when found.
-
-// IMPORTANT:
-//      LOL, wait for the build process to have created the .vite folder structure. so we can copy over the NextJS files...
-    await sleep('2500ms');
-
-    echo`~~~ Copy compiled frontend packages into the backend renderer build folder...`
-    await $`mkdir -p packages/backend/.vite/renderer/the_window/`
-    await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
-
-    await buildPromise;
+    clearInterval(feInterval);
 } catch {
     // Don't really care
 } finally {
