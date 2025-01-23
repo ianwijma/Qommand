@@ -35,7 +35,7 @@ try {
         if (!fs.existsSync('packages/backend/.vite/renderer/the_window/')) {
             echo`~~~ Copy compiled frontend packages into the backend renderer build folder...`
             await $`mkdir -p packages/backend/.vite/renderer/the_window/`
-            await $`cp -r  packages/backend/.vite/renderer/the_window/`;
+            await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
         }
     }, 50)
 
