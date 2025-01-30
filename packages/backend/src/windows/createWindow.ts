@@ -21,6 +21,10 @@ export type CreateWindowParams = {
     minHeight?: number,
     resizable?: boolean,
     openOnCursorScreen?: boolean,
+    alwaysOnTop?: boolean,
+    posX?: number,
+    posY?: number,
+    movable?: boolean,
 }
 
 type OpenParams = { urlParams?: UrlParams }
@@ -28,6 +32,7 @@ type OpenParams = { urlParams?: UrlParams }
 export type CreateWindowReturn = {
     initialize: () => Promise<void>;
     open: (params?: OpenParams) => Promise<void>;
+    toggle: (params?: OpenParams) => Promise<void>;
     close: () => Promise<void>;
     minimize: () => Promise<void>;
     openDevTools: () => Promise<void>;
@@ -47,6 +52,10 @@ export const createWindow = ({
                                  minHeight = 700,
                                  resizable = true,
                                  openOnCursorScreen = true,
+                                 alwaysOnTop = false,
+                                 posX = undefined,
+                                 posY = undefined,
+                                 movable = true,
                              }: CreateWindowParams): CreateWindowReturn => {
     let window: BrowserWindow;
     let loadWindowPromise: Promise<void>;
@@ -130,16 +139,34 @@ export const createWindow = ({
         isInitialized();
 
         // Get mouse cursor absolute position
-        const {x, y} = screen.getCursorScreenPoint();
+        const {x: cursorX, y: cursorY} = screen.getCursorScreenPoint();
 
         // Find the display where the mouse cursor will be
-        const currentDisplay = screen.getDisplayNearestPoint({x, y});
+        const currentDisplay = screen.getDisplayNearestPoint({x: cursorX, y: cursorY});
 
-        // Set window position to that display coordinates
-        window.setPosition(currentDisplay.workArea.x, currentDisplay.workArea.y);
+        const {width: windowWidth, height: windowHeight} = window.getBounds();
 
         // Center window relatively to that display
-        window.center();
+        const {x: screenX, y: screenY, width: screenWidth, height: screenHeight} = currentDisplay.workArea;
+        const centerX = screenX + (screenWidth / 2) - (windowWidth / 2);
+        const centerY = screenY + (screenHeight / 2) - (windowHeight / 2);
+
+        const targetX = posX ? screenX + posX : centerX;
+        const targetY = posY ? screenY + posY : centerY;
+        console.log('Screen Pos', {
+            title,
+            windowWidth,
+            windowHeight,
+            screenX,
+            screenY,
+            screenWidth,
+            screenHeight,
+            centerX,
+            centerY,
+            targetX,
+            targetY
+        });
+        window.setPosition(targetX, targetY);
 
         // Display the window
         window.show();
@@ -183,6 +210,14 @@ export const createWindow = ({
 
             // Move the window in front of the devtools
             window.focus();
+        }
+    }
+
+    const toggle = async ({urlParams}: OpenParams = {}) => {
+        if (window.isVisible()) {
+            await close();
+        } else {
+            await open({urlParams});
         }
     }
 
@@ -260,7 +295,11 @@ export const createWindow = ({
             resizable: resizable,
             frame: false,
             autoHideMenuBar: true,
+            alwaysOnTop,
             title,
+            x: posX,
+            y: posY,
+            movable,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js'),
             },
@@ -282,6 +321,7 @@ export const createWindow = ({
     return {
         initialize,
         open,
+        toggle,
         close,
         minimize,
         openDevTools,

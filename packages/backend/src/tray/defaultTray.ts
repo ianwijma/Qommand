@@ -7,6 +7,7 @@ import {resetAllSettings} from "../utils/resetAllSettings";
 import {commandsWindow} from "../windows/commands.window";
 import {defaultLogo} from '@qommand/common/src/logos'
 import {aboutWindow} from "../windows/about.window";
+import {runnerWindow} from "../windows/runner.window";
 
 export const defaultTray = {
     async initialize() {
@@ -41,6 +42,11 @@ export const defaultTray = {
                 label: 'Qommands',
                 type: 'normal',
                 click: () => commandsWindow.open()
+            },
+            {
+                label: 'Toggle Runner',
+                type: 'normal',
+                click: () => runnerWindow.toggle()
             },
             {
                 label: 'About',

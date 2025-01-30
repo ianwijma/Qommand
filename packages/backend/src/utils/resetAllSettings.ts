@@ -1,7 +1,7 @@
 import {confirmDialog} from "../windows/dialog.window";
-import {commandsFolderSettings, taskFolderSettings} from "../settings/folders.settings";
-import {tasksSettings} from "../settings/tasks.setting";
+import {commandsFolderSettings} from "../settings/folders.settings";
 import {commandsSettings} from "../settings/commands.setting";
+import {keyboardSettings} from "../settings/keyboard.setting";
 
 export const resetAllSettings = async () => {
     const {confirmed} = await confirmDialog.open({
@@ -10,8 +10,7 @@ export const resetAllSettings = async () => {
     })
 
     if (confirmed) {
-        await taskFolderSettings.resetSettings();
-        await tasksSettings.resetSettings();
+        await keyboardSettings.resetSettings();
         await commandsFolderSettings.resetSettings();
         await commandsSettings.resetSettings();
     }

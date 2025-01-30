@@ -66,7 +66,6 @@ export const createSettings = <T extends BaseSettings>({
 
         const updatedSettings = getSettings();
 
-        console.log('Settings updated', {name, settings: JSON.stringify(updatedSettings)});
         eventHandler.emit<SettingsUpdatedEventData<T>>(settingsUpdatedEventName, {
             settingName: name,
             updatedSettings,
