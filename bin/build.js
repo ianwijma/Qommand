@@ -32,12 +32,13 @@ try {
 
     // Ensure the frontend build ends up in the backend build output folder.
     const feInterval = setInterval(async () => {
-        if (!fs.existsSync('packages/backend/.vite/renderer/the_window/')) {
+        const frontendIsPresent = await fs.pathExists('packages/backend/.vite/renderer/the_window/')
+        if (!frontendIsPresent) {
             echo`~~~ Copy compiled frontend packages into the backend renderer build folder...`
             await $`mkdir -p packages/backend/.vite/renderer/the_window/`
             await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
         }
-    }, 50)
+    }, 100)
 
     echo`~~~ Build backend...`
     await $`npm run make --workspace=packages/backend`;
