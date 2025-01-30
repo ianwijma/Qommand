@@ -19,10 +19,21 @@ const TitleBarButton = ({children, onClick}: TitleBarButtonProps) => {
 type TitleBarProps = PropsWithChildren & {
     showMinimize?: boolean;
     showClose?: boolean;
+    onMinimizeClicked?: () => void;
+    onCloseClicked?: () => void;
 }
 
-export const TitleBar = ({children, showMinimize = true, showClose = true}: TitleBarProps) => {
+export const TitleBar = ({
+                             children,
+                             showMinimize = true,
+                             showClose = true,
+                             onMinimizeClicked,
+                             onCloseClicked
+                         }: TitleBarProps) => {
     const {minimize, close} = useWindowControls();
+
+    onMinimizeClicked ??= minimize;
+    onCloseClicked ??= close;
 
     return <div id='title-bar' className='flex justify-between bg-slate-800 px-1 py-1'>
         <div className='flex items-center gap-1'>
@@ -34,14 +45,14 @@ export const TitleBar = ({children, showMinimize = true, showClose = true}: Titl
         <div className='flex gap-2'>
             {
                 showMinimize && (
-                    <TitleBarButton onClick={minimize}>
+                    <TitleBarButton onClick={onMinimizeClicked}>
                         <FontAwesomeIcon icon={faWindowMinimize} size='xs'/>
                     </TitleBarButton>
                 )
             }
             {
                 showClose && (
-                    <TitleBarButton onClick={close}>
+                    <TitleBarButton onClick={onCloseClicked}>
                         <FontAwesomeIcon icon={faXmark} size='sm'/>
                     </TitleBarButton>
                 )

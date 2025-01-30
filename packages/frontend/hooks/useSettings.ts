@@ -23,6 +23,11 @@ export const useSettings = <T extends BaseSettings>(settingsName: SettingsName) 
             {timeout: 200}
         );
 
+        console.log('Setting Initialised', {
+            settingsName,
+            initialSettings
+        });
+
         setSettings(initialSettings);
     }
 
@@ -33,6 +38,11 @@ export const useSettings = <T extends BaseSettings>(settingsName: SettingsName) 
         // TODO: This does not seem to trigger / work anymore
 
         if (name === settingsName) {
+            console.log('Setting Updated', {
+                settingsName,
+                name,
+                updatedSettings
+            });
             setSettings(updatedSettings);
         }
     })

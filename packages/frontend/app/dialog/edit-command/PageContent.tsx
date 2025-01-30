@@ -1,6 +1,5 @@
 'use client'
 
-import {useEffect} from "react";
 import {useSettings} from "../../../hooks/useSettings";
 import {Commands, CommandSettings} from "@qommand/common/src/settings/commands.settings.types";
 import {recursiveMerge} from "@qommand/common/src/object";
@@ -29,8 +28,6 @@ export const PageContent = () => {
         handleUpdate();
     }
 
-    useEffect(() => console.log('Command updated', command), [command]);
-
     if (isLoading || !command) return <div>Loading...</div>
 
     const CommandConfig = () => {
@@ -50,7 +47,9 @@ export const PageContent = () => {
                                            readOnly
                                            disabled
                                            className='text-black w-full'/>
-                                    <button onClick={() => updateCommand({commandConfig: {path: ''}})}>unset</button>
+                                    <button onClick={() => updateCommand({commandConfig: {path: ''}})}
+                                            type='button'>unset
+                                    </button>
                                 </div>
                             ) : (
                                 <input
@@ -137,7 +136,7 @@ export const PageContent = () => {
             />
             <hr/>
             <CommandConfig/>
-            <button onClick={() => emitButtonClick('cancel')}>Done Editing</button>
+            <button onClick={() => emitButtonClick('cancel')} type='button'>Done Editing</button>
         </form>
     )
 }

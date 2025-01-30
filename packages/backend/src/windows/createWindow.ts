@@ -148,9 +148,6 @@ export const createWindow = ({
     const open = async ({urlParams}: OpenParams = {}) => {
         isInitialized();
 
-        // Always trigger, ensure the dev tools are open
-        if (isDev() || startupArguments.dev) await openDevTools();
-
         const url = getUrl();
         const hash = getHash({urlParams});
         const search = new URLSearchParams(hash).toString();
@@ -178,6 +175,14 @@ export const createWindow = ({
             if (openOnCursorScreen) {
                 moveWindowToCursorScreen();
             }
+        }
+
+        // Always trigger, ensure the dev tools are open
+        if (isDev() || startupArguments.dev) {
+            await openDevTools();
+
+            // Move the window in front of the devtools
+            window.focus();
         }
     }
 
