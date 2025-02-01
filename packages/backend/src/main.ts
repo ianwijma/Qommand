@@ -3,7 +3,6 @@ import started from 'electron-squirrel-startup';
 import {receiveWindow} from "./windows/receive.window";
 import {sendWindow} from "./windows/send.window";
 import {defaultTray} from "./tray/defaultTray";
-import {taskWindow} from "./windows/task.window";
 import {startupArguments} from "./utils/startupArguments";
 import {isDev} from "./utils/isDev";
 import './windows/dialog.window';
@@ -52,7 +51,6 @@ if (!isSingleInstance) {
         await keyboardShortcuts.initialize();
 
         if (isDev()) {
-            await taskWindow.initialize();
             await receiveWindow.initialize();
             await sendWindow.initialize();
         }

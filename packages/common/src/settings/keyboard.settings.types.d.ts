@@ -1,7 +1,7 @@
 import {BaseSettings} from "../settings.types";
 
 export type KeyboardShortcut = string;
-export type KeyboardActionTarget = 'tasks' | 'window';
+export type KeyboardActionTarget = 'commands' | 'window';
 export type KeyboardAction = {
     target: KeyboardActionTarget,
     targetId: string,

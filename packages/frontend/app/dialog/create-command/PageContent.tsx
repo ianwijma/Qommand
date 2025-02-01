@@ -23,18 +23,18 @@ export const PageContent = () => {
     return (
         <form ref={formRef} className="flex flex-col gap-3">
             <span>
-                Create a task
+                Create a command
             </span>
             <input name='name' placeholder='Command Name' className='text-black'/>
             <div>
                 {
-                    Object.keys(CommandTypes).map((taskType, index) => {
-                        const typeName = CommandTypes[taskType];
+                    Object.keys(CommandTypes).map((commandType, index) => {
+                        const typeName = CommandTypes[commandType];
 
                         return (
-                            <div key={taskType}>
-                                <input type='radio' name='type' value={taskType} defaultChecked={index === 0}/>
-                                <label htmlFor={taskType}>{typeName}</label>
+                            <div key={commandType}>
+                                <input type='radio' name='type' value={commandType} defaultChecked={index === 0}/>
+                                <label htmlFor={commandType}>{typeName}</label>
                             </div>
                         )
                     })

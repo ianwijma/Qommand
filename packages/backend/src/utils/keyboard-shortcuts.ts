@@ -3,16 +3,16 @@ import {settingsUpdatedEventName, SettingsUpdatedEventData} from '@qommand/commo
 import {KeyboardAction, KeyboardSettings} from "@qommand/common/src/settings/keyboard.settings.types";
 import {globalShortcut} from 'electron'
 import {runnerWindow} from "../windows/runner.window";
-import {TaskId} from "@qommand/common/src/settings/tasks.settings.types";
 import {eventHandler} from "./eventHandler";
+import {CommandId} from "@qommand/common/src/settings/commands.settings.types";
 
 export type KeyboardShortcuts = {
     initialize: () => Promise<void>,
 }
 
 const createKeyboardShortcuts = (): KeyboardShortcuts => {
-    const handleTask = async (taskId: TaskId): Promise<void> => {
-        console.log('Handle Task', {taskId})
+    const handleCommand = async (commandId: CommandId): Promise<void> => {
+        console.log('Handle Command', {commandId})
     }
 
     const handleWindow = async (id: string) => {
@@ -29,8 +29,8 @@ const createKeyboardShortcuts = (): KeyboardShortcuts => {
             case "window":
                 await handleWindow(targetId);
                 break;
-            case "tasks":
-                await handleTask(targetId);
+            case "commands":
+                await handleCommand(targetId);
                 break;
             default:
                 console.error(`Unknown target ${target}`);

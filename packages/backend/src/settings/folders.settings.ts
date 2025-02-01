@@ -12,5 +12,4 @@ const createFolderSettings = (folderName: FolderName) => {
     });
 }
 
-export const taskFolderSettings = createFolderSettings('tasks');
 export const commandsFolderSettings = createFolderSettings('commands');

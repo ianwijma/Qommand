@@ -10,10 +10,6 @@ type OpenInputDialogOptions = {
     value?: string;
 }
 
-type OpenCreateTaskDialogOptions = {
-    type: 'create-task';
-}
-
 type OpenCreateCommandDialogOptions = {
     type: 'create-command';
 }
@@ -32,7 +28,6 @@ type EditCommandDialogOptions = {
 
 export type OpenDialogOptions =
     OpenInputDialogOptions
-    | OpenCreateTaskDialogOptions
     | OpenCreateCommandDialogOptions
     | OpenConfirmDialogOptions
     | EditCommandDialogOptions;

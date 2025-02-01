@@ -87,7 +87,7 @@ const FolderItem = ({
                 <span>
                     {
                         targetId === null ? (
-                            <button onClick={() => handleCreateTarget(subFolders)}>New Task</button>
+                            <button onClick={() => handleCreateTarget(subFolders)}>New Command</button>
                         ) : ''
                     }
                     {' '}

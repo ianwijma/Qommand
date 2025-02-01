@@ -1,6 +1,22 @@
 'use client';
 
+import {useSettings} from "../../hooks/useSettings";
+import {CommandSettings} from "@qommand/common/src/settings/commands.settings.types";
+import {FolderSettings} from "@qommand/common/src/settings/folders.settings.types";
+
 export default function AboutPage() {
+    const {
+        isLoading: isLoadingCommands,
+        settings: commandsSettings,
+        updateSettings: updateCommandsSettings
+    } = useSettings<CommandSettings>('commands');
+    const {
+        isLoading: isLoadingFolder,
+        settings: folderSettings,
+        updateSettings: updateFolderSettings
+    } = useSettings<FolderSettings>('folder-commands');
+
+
     // TODO: Make only the container and sub-items interactible: https://stackoverflow.com/a/78050093
     return <div className="flex flex-col items-center justify-center">
         <div className="w-screen h-24 p-3 bg-slate-700 rounded-3xl draggable">

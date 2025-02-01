@@ -95,17 +95,6 @@ export const inputDialog = createDialog<SimpleInputParams, SimpleInputReturn>({
     route: 'dialog/input',
 });
 
-type CreateTaskParams = {};
-type CreateTaskReturn = {
-    input: string,
-    type: string,
-};
-
-export const createTaskDialog = createDialog<CreateTaskParams, CreateTaskReturn>({
-    title: 'Create Tasks Dialog',
-    route: 'dialog/create-task',
-});
-
 type CreateCommandParams = {};
 type CreateCommandReturn = {
     name: string,
@@ -148,7 +137,6 @@ export const editCommandDialog = createDialog<EditCommandParams, EditCommandRetu
 
 const dialogMap = {
     input: inputDialog,
-    'create-task': createTaskDialog,
     'create-command': createCommandDialog,
     'confirm': confirmDialog,
     'edit-command': editCommandDialog,
@@ -161,7 +149,7 @@ responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogReques
     if (type in dialogMap) {
         const dialogHandler = dialogMap[type];
 
-        // @ts-expect-error - rest can be either createTaskDialog of inputDialog, which makes rest unhappy.
+        // @ts-expect-error - rest is always correct
         return dialogHandler.open(rest)
     }
 
