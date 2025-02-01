@@ -7,7 +7,7 @@ export const keyboardSettings = createSettings<KeyboardSettings>({
     defaultSettings: {
         version: 1,
         shortcuts: {
-            [isMac() ? 'Command+Space' : 'Super+Space']: {
+            [isMac() ? 'Control+m' : 'Control+m']: {
                 target: 'window',
                 targetId: 'runner'
             }

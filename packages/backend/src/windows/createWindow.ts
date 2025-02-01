@@ -11,6 +11,11 @@ import {sleep} from "../utils/sleep";
 
 type UrlParams = Record<string, string>;
 
+type OnEventsParams = CreateWindowReturn & {
+    window: BrowserWindow;
+}
+type OnEvents = (params: OnEventsParams) => void;
+
 export type CreateWindowParams = {
     title: string,
     route: string,
@@ -25,6 +30,10 @@ export type CreateWindowParams = {
     posX?: number,
     posY?: number,
     movable?: boolean,
+    hasShadow?: boolean,
+    canOpenFn?: (params: { window: BrowserWindow }) => boolean | Promise<boolean>,
+    onBlur?: OnEvents,
+    transparent?: boolean,
 }
 
 type OpenParams = { urlParams?: UrlParams }
@@ -56,6 +65,10 @@ export const createWindow = ({
                                  posX = undefined,
                                  posY = undefined,
                                  movable = true,
+                                 canOpenFn = () => true,
+                                 onBlur = () => undefined,
+                                 hasShadow = true,
+                                 transparent = false,
                              }: CreateWindowParams): CreateWindowReturn => {
     let window: BrowserWindow;
     let loadWindowPromise: Promise<void>;
@@ -138,12 +151,10 @@ export const createWindow = ({
     const moveWindowToCursorScreen = () => {
         isInitialized();
 
-        // Get mouse cursor absolute position
-        const {x: cursorX, y: cursorY} = screen.getCursorScreenPoint();
-
         // Find the display where the mouse cursor will be
-        const currentDisplay = screen.getDisplayNearestPoint({x: cursorX, y: cursorY});
+        const currentDisplay = screen.getPrimaryDisplay();
 
+        // Get the windows sizes
         const {width: windowWidth, height: windowHeight} = window.getBounds();
 
         // Center window relatively to that display
@@ -175,6 +186,10 @@ export const createWindow = ({
     const open = async ({urlParams}: OpenParams = {}) => {
         isInitialized();
 
+        const canOpen = await canOpenFn({window});
+
+        if (!canOpen) return;
+
         const url = getUrl();
         const hash = getHash({urlParams});
         const search = new URLSearchParams(hash).toString();
@@ -190,18 +205,14 @@ export const createWindow = ({
 
         if (window.isVisible()) {
             window.show();
-
-            if (openOnCursorScreen) {
-                moveWindowToCursorScreen();
-            }
         } else {
             await loadWindowPromise;
 
             window.show();
+        }
 
-            if (openOnCursorScreen) {
-                moveWindowToCursorScreen();
-            }
+        if (openOnCursorScreen) {
+            moveWindowToCursorScreen();
         }
 
         // Always trigger, ensure the dev tools are open
@@ -300,6 +311,8 @@ export const createWindow = ({
             x: posX,
             y: posY,
             movable,
+            hasShadow,
+            transparent,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js'),
             },
@@ -310,6 +323,7 @@ export const createWindow = ({
         initializeWindowEvents();
         initializeEventBus();
         initializeWindowActions();
+        initializeEvents();
     }
 
     const getUniqueWindowId = () => {
@@ -318,7 +332,7 @@ export const createWindow = ({
         return window.id
     }
 
-    return {
+    const returnData: CreateWindowReturn = {
         initialize,
         open,
         toggle,
@@ -330,4 +344,15 @@ export const createWindow = ({
         destroy,
         getUniqueWindowId
     }
+
+    const initializeEvents = () => {
+        const eventParams = {
+            window,
+            ...returnData
+        }
+
+        window.on('blur', () => onBlur(eventParams))
+    }
+
+    return returnData
 }
