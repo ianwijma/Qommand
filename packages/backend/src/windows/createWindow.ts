@@ -164,19 +164,6 @@ export const createWindow = ({
 
         const targetX = posX ? screenX + posX : centerX;
         const targetY = posY ? screenY + posY : centerY;
-        console.log('Screen Pos', {
-            title,
-            windowWidth,
-            windowHeight,
-            screenX,
-            screenY,
-            screenWidth,
-            screenHeight,
-            centerX,
-            centerY,
-            targetX,
-            targetY
-        });
         window.setPosition(targetX, targetY);
 
         // Display the window
