@@ -33,8 +33,10 @@ export const PageContent = () => {
 
                         return (
                             <div key={commandType}>
-                                <input type='radio' name='type' value={commandType} defaultChecked={index === 0}/>
-                                <label htmlFor={commandType}>{typeName}</label>
+                                <label>
+                                    <input type='radio' name='type' value={commandType} defaultChecked={index === 0}/>
+                                    {typeName}
+                                </label>
                             </div>
                         )
                     })

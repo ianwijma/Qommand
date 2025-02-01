@@ -102,16 +102,19 @@ export default function AboutPage() {
                 onChange={(e) => setQuery(e.target.value)}
             />
         </div>
-        <div className="w-11/12 p-3 bg-slate-700 rounded-b-3xl">
+        <div className="w-11/12 p-3 bg-slate-700 rounded-b-3xl max-h-[800px] overflow-x-hidden">
             <ul className="flex flex-col gap-1">
                 {/* TODO: Fix the li borders. */}
-                {results.map(({title, id, callback}: Result, index) => (
-                    <li key={id} className='bg-white text-black flex items-center rounded-2xl text-xl h-10 px-2'>
-                        <span>
-                            {title}
-                        </span>
-                    </li>
-                ))}
+                {results.map(({title, id, callback}: Result, index) => {
+
+                    return (
+                        <li key={id} className='bg-white text-black flex items-center rounded-2xl text-xl h-10 px-2'>
+                            <span>
+                                {title}
+                            </span>
+                        </li>
+                    )
+                })}
             </ul>
         </div>
     </div>

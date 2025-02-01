@@ -317,9 +317,9 @@ export default function CommandsPage() {
             <button className='whitespace-nowrap' onClick={createCategory}>Add category</button>
         </div>
 
-        <div className="">
-            <table className="w-full">
-                <thead>
+        <div className='overflow-y-scroll'>
+            <table className="w-full bg-slate-700">
+                <thead className="sticky top-0 bg-slate-700">
                 <tr>
                     <TableHeader className='w-5'></TableHeader>
                     <TableHeader>Name</TableHeader>
