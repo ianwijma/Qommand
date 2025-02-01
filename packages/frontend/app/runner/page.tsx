@@ -1,10 +1,17 @@
 'use client';
 
-import {DefaultWindowContainer} from "../../components/windowContainer/DefaultWindowContainer";
-
 export default function AboutPage() {
-
-    return <DefaultWindowContainer title='Runner'>
-        Run all the things!
-    </DefaultWindowContainer>
+    // TODO: Make only the container and sub-items interactible: https://stackoverflow.com/a/78050093
+    return <div className="flex flex-col items-center justify-center">
+        <div className="w-screen h-24 p-3 bg-slate-700 rounded-3xl draggable">
+            <input className='w-full h-full rounded-2xl text-black text-2xl px-2 not-draggable' autoFocus/>
+        </div>
+        <div className="w-11/12 p-3 bg-slate-700 rounded-b-3xl">
+            <ul className="flex flex-col gap-1">
+                <li className='bg-white text-black flex items-center rounded-t-2xl text-xl h-10 px-2'>First</li>
+                <li className='bg-white text-black flex items-center text-xl h-10 px-2'>Second</li>
+                <li className='bg-white text-black flex items-center rounded-b-2xl text-xl h-10 px-2'>Third</li>
+            </ul>
+        </div>
+    </div>
 }
