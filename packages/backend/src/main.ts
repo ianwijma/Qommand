@@ -16,6 +16,7 @@ import {keyboardSettings} from "./settings/keyboard.setting";
 import {runnerWindow} from "./windows/runner.window";
 import {keyboardShortcuts} from "./utils/keyboard-shortcuts";
 import {searchSettings} from "./settings/search.setting";
+import {commandRunner} from "./utils/commandRunner";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -51,6 +52,7 @@ if (!isSingleInstance) {
 
         // Background Processes
         await keyboardShortcuts.initialize();
+        await commandRunner.initialize();
 
         if (isDev()) {
             await receiveWindow.initialize();

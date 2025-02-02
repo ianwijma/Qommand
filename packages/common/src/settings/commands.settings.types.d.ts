@@ -16,10 +16,16 @@ export type BaseCommand = {
 
 export type ShellCommand = BaseCommand & {
     type: 'shell';
+    commandConfig: {
+        code: string
+    };
 }
 
 export type ScriptCommand = BaseCommand & {
     type: 'script';
+    commandConfig: {
+        path: string
+    };
 }
 
 export type Commands = ShellCommand | ScriptCommand;
