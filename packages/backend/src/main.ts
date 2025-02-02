@@ -53,7 +53,8 @@ if (!isSingleInstance) {
         await aboutWindow.initialize();
 
         // Background Processes
-        await nodeRed.initialize();
+        // TODO: Resolve post-build error: (node:224924) UnhandledPromiseRejectionWarning: Error: Cannot find module '@node-red/nodes'
+        await nodeRed.initialize().catch(console.error);
         await keyboardShortcuts.initialize();
         await commandRunner.initialize();
 
