@@ -156,8 +156,6 @@ export default function AboutPage() {
         selectedEl.scrollIntoView({behavior: 'smooth', block: 'nearest'});
     }, [selectedRef, selected]);
 
-    console.log('results', {results})
-
     // TODO: Make only the container and sub-items interactible: https://stackoverflow.com/a/78050093
     return <div className="flex flex-col items-center justify-center">
         <div className="w-screen h-20 p-3 bg-slate-700 rounded-3xl draggable">
@@ -183,8 +181,6 @@ export default function AboutPage() {
                     }
 
                     const isSelected = index === selected;
-
-                    console.log('Item', {isSelected});
 
                     return (
                         <li key={id} ref={isSelected ? selectedRef : null}>
