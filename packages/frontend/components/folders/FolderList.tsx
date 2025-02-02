@@ -66,8 +66,6 @@ const FolderItem = ({
     const toggleCollapse = () => {
         folder.collapsed = !collapsed;
 
-        // TODO: Collapse the sub folders as well.
-
         handleUpdate();
     }
 
