@@ -1,7 +1,7 @@
 'use client';
 
 import {useSettings} from "../../hooks/useSettings";
-import {CommandId, CommandSettings} from "@qommand/common/src/settings/commands.settings.types";
+import {CommandId, Commands, CommandSettings} from "@qommand/common/src/settings/commands.settings.types";
 import {FolderSettings} from "@qommand/common/src/settings/folders.settings.types";
 import {useEffect, useMemo, useRef, useState} from "react";
 import {SearchSettings} from "@qommand/common/src/settings/search.settings.types";
@@ -55,17 +55,21 @@ export default function AboutPage() {
         const isSearching = query.trim() !== '';
         const searchQuery = query.toLowerCase();
         const matches = (input: string) => input.toLowerCase().includes(searchQuery);
-        const toResult = (commandId: CommandId): Result => ({
-            id: commandId,
-            callback: () => {
-                eventHandler.emit<RunCommandEventData>(runCommandEventName, {commandId});
+        const toResult = (command: Commands): Result => {
+            const {id: commandId} = command;
 
-                close();
-            },
-            title: commands[commandId].name,
-            folder: '', // TODO: Fix Folders
-            weight: searchWeights[commandId] ?? 0,
-        })
+            return {
+                id: commandId,
+                callback: () => {
+                    eventHandler.emit<RunCommandEventData>(runCommandEventName, {commandId});
+
+                    close();
+                },
+                title: commands[commandId].name,
+                folder: '', // TODO: Fix Folders
+                weight: searchWeights[commandId] ?? 0,
+            }
+        }
         const sortByWeights = (a: Result, b: Result) => b.weight - a.weight;
 
         let finalResults: Result[] = [];
@@ -78,7 +82,7 @@ export default function AboutPage() {
 
                 if (!enabled) return;
 
-                const commandResult = toResult(commandId);
+                const commandResult = toResult(command);
 
                 aliases.forEach((alias) => {
                     if (!added && matches(alias)) {
@@ -99,7 +103,9 @@ export default function AboutPage() {
         } else {
             finalResults = Object
                 .keys(commands)
-                .map((commandId) => toResult(commandId))
+                .map((commandId) => commands[commandId])
+                .filter(({enabled}) => enabled)
+                .map((command) => toResult(command))
                 .sort(sortByWeights);
         }
 
@@ -164,27 +170,27 @@ export default function AboutPage() {
         <div className="w-11/12 p-3 bg-slate-700 rounded-b-3xl max-h-[800px] overflow-x-hidden">
             <ul className="flex flex-col gap-1">
                 {results.map(({title, id, callback}: Result, index) => {
-                    let roundedClass = 'rounded-2xl';
+                    let roundTop = true;
+                    let roundBottom = true;
                     if (resultAmount > 1) {
-                        roundedClass = '';
+                        roundTop = false;
+                        roundBottom = false;
                         if (index === 0) {
-                            roundedClass = 'rounded-t-2xl';
+                            roundTop = true;
                         } else if (index + 1 === resultAmount) {
-                            roundedClass = 'rounded-b-2xl';
+                            roundBottom = true;
                         }
                     }
 
                     const isSelected = index === selected;
-                    let backgroundColour = '';
-                    if (isSelected) {
-                        backgroundColour = 'bg-slate-300'
-                    }
+
+                    console.log('Item', {isSelected});
 
                     return (
                         <li key={id} ref={isSelected ? selectedRef : null}>
                             <button
                                 onClick={() => callback()}
-                                className={`bg-white w-full text-black flex items-center text-xl h-10 px-2  ${roundedClass} ${backgroundColour}`}>
+                                className={`w-full text-black flex items-center text-xl h-10 px-2 hover:bg-slate-400 ${roundTop ? 'rounded-t-2xl' : ''} ${roundBottom ? 'rounded-b-2xl' : ''} ${isSelected ? 'bg-slate-300' : 'bg-white'}`}>
                                 {title}
                             </button>
                         </li>
