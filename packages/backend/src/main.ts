@@ -26,6 +26,7 @@ if (started) {
 
 let isSingleInstance = app.requestSingleInstanceLock()
 if (!isSingleInstance) {
+    console.log('Qommand can only be opened once.')
     app.quit();
 } else {
     const onBeforeQuit = () => {

@@ -7,8 +7,6 @@ import {app} from "electron";
 const FILES_DIR = isDev() ? '.files-dev' : '.files';
 const ROOT_DIR = path.resolve(app.getPath('userData'), FILES_DIR);
 
-console.log("ROOT_DIR", ROOT_DIR);
-
 const normalizeFilePath = (relativePath: string): string => {
     const resolvedPath = path.resolve(ROOT_DIR, relativePath);
 
