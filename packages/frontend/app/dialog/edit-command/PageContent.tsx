@@ -32,6 +32,13 @@ export const PageContent = () => {
 
     const CommandConfig = () => {
         switch (command.type) {
+            case 'node-red':
+                return <div className='h-full flex flex-col bg-slate-800'>
+                    <div className='w-full'>
+                        Task Bar
+                    </div>
+                    <iframe className='w-full h-full' src='https://example.com'/>
+                </div>
             case 'script':
                 return (
                     <>
@@ -96,47 +103,52 @@ export const PageContent = () => {
     }
 
     return (
-        <form className="flex flex-col gap-3">
-            <label htmlFor='name'>
-                Name
-            </label>
-            <input
-                id='name'
-                name='name'
-                placeholder='Command Name'
-                required
-                className='text-black'
-                value={command.name}
-                // currentTarget.checkValidity() does not allow empty fields :/
-                onChange={({currentTarget}) => currentTarget.checkValidity() && updateCommand({name: currentTarget.value})}
-            />
-            <hr/>
-            <label htmlFor='aliases'>
-                Aliases
-            </label>
-            <input
-                id='aliases'
-                name='aliases'
-                placeholder='Command Aliases'
-                className='text-black'
-                value={command.aliases.join(', ')}
-                onChange={({currentTarget}) => updateCommand({aliases: currentTarget.value.split(',').map(alias => alias.trim())})}
-            />
-            <hr/>
-            <label htmlFor='hotkey'>
-                Hotkey
-            </label>
-            <input
-                id='hotkey'
-                name='hotkey'
-                placeholder='Command Hotkey'
-                className='text-black'
-                value={command.hotkey}
-                onChange={({currentTarget}) => updateCommand({hotkey: currentTarget.value})}
-            />
-            <hr/>
-            <CommandConfig/>
+        <form className="flex flex-col gap-3 h-full">
+            <div className='flex gap-3'>
+                <div className='flex flex-col gap-3 w-1/3'>
+                    <label htmlFor='name'>
+                        Name
+                    </label>
+                    <input
+                        id='name'
+                        name='name'
+                        placeholder='Command Name'
+                        required
+                        className='text-black'
+                        value={command.name}
+                        // currentTarget.checkValidity() does not allow empty fields :/
+                        onChange={({currentTarget}) => currentTarget.checkValidity() && updateCommand({name: currentTarget.value})}
+                    />
+                </div>
+                <div className='flex flex-col gap-3 w-1/3'>
+                    <label htmlFor='aliases'>
+                        Aliases
+                    </label>
+                    <input
+                        id='aliases'
+                        name='aliases'
+                        placeholder='Command Aliases'
+                        className='text-black'
+                        value={command.aliases.join(', ')}
+                        onChange={({currentTarget}) => updateCommand({aliases: currentTarget.value.split(',').map(alias => alias.trim())})}
+                    />
+                </div>
+                <div className='flex flex-col gap-3 w-1/3'>
+                    <label htmlFor='hotkey'>
+                        Hotkey
+                    </label>
+                    <input
+                        id='hotkey'
+                        name='hotkey'
+                        placeholder='Command Hotkey'
+                        className='text-black'
+                        value={command.hotkey}
+                        onChange={({currentTarget}) => updateCommand({hotkey: currentTarget.value})}
+                    />
+                </div>
+            </div>
             <button onClick={() => emitButtonClick('cancel')} type='button'>Done Editing</button>
+            <CommandConfig/>
         </form>
     )
 }

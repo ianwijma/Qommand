@@ -14,6 +14,11 @@ export type BaseCommand = {
     commandConfig: SimpleEventBusData
 }
 
+export type NodeRedCommand = BaseCommand & {
+    type: 'node-red';
+    commandConfig: {};
+}
+
 export type ShellCommand = BaseCommand & {
     type: 'shell';
     commandConfig: {
@@ -28,7 +33,7 @@ export type ScriptCommand = BaseCommand & {
     };
 }
 
-export type Commands = ShellCommand | ScriptCommand;
+export type Commands = ShellCommand | ScriptCommand | NodeRedCommand;
 
 export type CommandSettings = BaseSettings & {
     commands: { [key: CommandId]: Commands }

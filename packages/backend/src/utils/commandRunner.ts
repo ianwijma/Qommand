@@ -55,6 +55,8 @@ const createCommandRunner = () => {
 
     return {
         initialize: async () => {
+            console.log("Initializing Command Runner");
+
             eventHandler.listen<RunCommandEventData>(runCommandEventName, async ({commandId}) => {
                 const {commands} = commandsSettings.getSettings();
 

@@ -9,6 +9,7 @@ export const PageContent = () => {
     const formRef = useRef<HTMLFormElement>(null);
 
     const CommandTypes = {
+        'node-red': "Flow",
         'script': "Script",
         'shell': "Shell command",
     }
