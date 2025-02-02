@@ -17,14 +17,14 @@ export type BaseCommand = {
 export type ShellCommand = BaseCommand & {
     type: 'shell';
     commandConfig: {
-        code: string
+        code?: string
     };
 }
 
 export type ScriptCommand = BaseCommand & {
     type: 'script';
     commandConfig: {
-        path: string
+        path?: string
     };
 }
 
