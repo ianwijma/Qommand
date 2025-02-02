@@ -1,0 +1,13 @@
+diff --git a/node_modules/@node-red/runtime/lib/index.js b/node_modules/@node-red/runtime/lib/index.js
+index 4ac7cfb..8c8460f 100644
+--- a/node_modules/@node-red/runtime/lib/index.js
++++ b/node_modules/@node-red/runtime/lib/index.js
+@@ -113,7 +113,7 @@ var version;
+ 
+ function getVersion() {
+     if (!version) {
+-        version = require(path.join(__dirname,"..","package.json")).version;
++        version = "4.0.8";
+         /* istanbul ignore else */
+         try {
+             fs.statSync(path.join(__dirname,"..","..","..","..",".git"));

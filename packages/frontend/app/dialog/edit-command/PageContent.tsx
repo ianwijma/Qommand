@@ -6,6 +6,9 @@ import {recursiveMerge} from "@qommand/common/src/object";
 import {useSearchParams} from "next/navigation";
 import {getPathForFile} from "../../../utils/files";
 import {useButtonClick} from "../../../hooks/useButtonClick";
+import {useRequestResponse} from "../../../hooks/useRequestResponse";
+import {nodeRedRequestName, NodeRedRequestReq, NodeRedRequestRes} from '@qommand/common/src/requests/node-red.request'
+import {useEffect} from "react";
 
 export const PageContent = () => {
     const {emitButtonClick} = useButtonClick();
@@ -19,11 +22,7 @@ export const PageContent = () => {
     const {commands = {}} = settings ?? {};
     const command = commands[commandId];
     const updateCommand = (updatedFields: Partial<Commands>) => {
-        console.log('pre-update', commands[commandId], updatedFields);
-
         commands[commandId] = recursiveMerge<Commands>(commands[commandId], updatedFields)
-
-        console.log('post-update', commands[commandId]);
 
         handleUpdate();
     }
@@ -31,13 +30,28 @@ export const PageContent = () => {
     if (isLoading || !command) return <div>Loading...</div>
 
     const CommandConfig = () => {
+        const {
+            isLoading,
+            sendRequest,
+            response,
+        } = useRequestResponse<NodeRedRequestReq, NodeRedRequestRes>(nodeRedRequestName, {});
+
+        useEffect(() => {
+            sendRequest()
+        }, []);
+
+        if (isLoading) return <div>Loading...</div>;
+
         switch (command.type) {
             case 'node-red':
                 return <div className='h-full flex flex-col bg-slate-800'>
                     <div className='w-full'>
                         Task Bar
                     </div>
-                    <iframe className='w-full h-full' src='https://example.com'/>
+                    <iframe
+                        className='w-full h-full'
+                        src={`http://${response.host}:${response.port}${response.adminPath}`}
+                    />
                 </div>
             case 'script':
                 return (
@@ -147,7 +161,6 @@ export const PageContent = () => {
                     />
                 </div>
             </div>
-            <button onClick={() => emitButtonClick('cancel')} type='button'>Done Editing</button>
             <CommandConfig/>
         </form>
     )

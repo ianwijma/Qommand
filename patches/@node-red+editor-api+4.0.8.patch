@@ -1,0 +1,15 @@
+diff --git a/node_modules/@node-red/editor-api/lib/auth/users.js b/node_modules/@node-red/editor-api/lib/auth/users.js
+index e85132d..a08c1f1 100644
+--- a/node_modules/@node-red/editor-api/lib/auth/users.js
++++ b/node_modules/@node-red/editor-api/lib/auth/users.js
+@@ -16,9 +16,7 @@
+ 
+ var util = require("util");
+ var clone = require("clone");
+-var bcrypt;
+-try { bcrypt = require('@node-rs/bcrypt'); }
+-catch(e) { bcrypt = require('bcryptjs'); }
++var bcrypt = require('bcryptjs');
+ var users = {};
+ var defaultUser = null;
+ 

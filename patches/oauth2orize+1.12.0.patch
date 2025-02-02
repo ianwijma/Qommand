@@ -1,0 +1,46 @@
+diff --git a/node_modules/oauth2orize/lib/index.js b/node_modules/oauth2orize/lib/index.js
+index ef1e058..bedc56e 100644
+--- a/node_modules/oauth2orize/lib/index.js
++++ b/node_modules/oauth2orize/lib/index.js
+@@ -34,15 +34,10 @@ exports.errorHandler = require('./middleware/errorHandler');
+ /**
+  * Auto-load bundled grants.
+  */
+-exports.grant = {};
+- 
+-fs.readdirSync(__dirname + '/grant').forEach(function(filename) {
+-  if (/\.js$/.test(filename)) {
+-    var name = path.basename(filename, '.js');
+-    var load = function () { return require('./grant/' + name); };
+-    exports.grant.__defineGetter__(name, load);
+-  }
+-});
++exports.grant = {
++  code: require('./grant/code'),
++  token: require('./grant/token'),
++};
+ 
+ // alias grants
+ exports.grant.authorizationCode = exports.grant.code;
+@@ -51,15 +46,12 @@ exports.grant.implicit = exports.grant.token;
+ /**
+  * Auto-load bundled exchanges.
+  */
+-exports.exchange = {};
+- 
+-fs.readdirSync(__dirname + '/exchange').forEach(function(filename) {
+-  if (/\.js$/.test(filename)) {
+-    var name = path.basename(filename, '.js');
+-    var load = function () { return require('./exchange/' + name); };
+-    exports.exchange.__defineGetter__(name, load);
+-  }
+-});
++exports.exchange = {
++  authorizationCode: require('./exchange/authorizationCode'),
++  clientCredentials: require('./exchange/clientCredentials'),
++  password: require('./exchange/password'),
++  refreshToken: require('./exchange/refreshToken'),
++};
+ 
+ // alias exchanges
+ exports.exchange.code = exports.exchange.authorizationCode;

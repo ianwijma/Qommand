@@ -6,7 +6,8 @@
     "dev": "node bin/dev.js",
     "build": "node bin/build.js",
     "build-quick": "node bin/build.js --quick",
-    "reset": "node bin/reset.js"
+    "reset": "node bin/reset.js",
+    "postinstall": "patch-package"
   },
   "author": "Ian Wijma (https://ian.wij.ma/)",
   "license": "",
@@ -16,6 +17,7 @@
   ],
   "devDependencies": {
     "concurrently": "^9.1.0",
+    "patch-package": "^8.0.0",
     "zx": "^8.2.4"
   }
 }

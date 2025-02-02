@@ -129,10 +129,10 @@ export const editCommandDialog = createDialog<EditCommandParams, EditCommandRetu
     title: 'Edit Command',
     route: 'dialog/edit-command',
     resizable: true,
-    width: 920,
-    height: 580,
-    minWidth: 920,
-    minHeight: 580,
+    width: 1080,
+    height: 640,
+    minWidth: 1080,
+    minHeight: 640,
 });
 
 const dialogMap = {
