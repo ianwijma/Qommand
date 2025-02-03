@@ -58,6 +58,7 @@ if (!isSingleInstance) {
         await nodeRed.initialize().catch(console.error);
         await keyboardShortcuts.initialize();
         await commandRunner.initialize();
+        // TODO: windowManager imports a native module that breaks...
         // await activeWindowManager.initialize();
 
         if (isDev()) {
