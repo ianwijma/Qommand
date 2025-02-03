@@ -1,5 +1,7 @@
 // EventBusData allows only parse-able objects to be passed
-export type SimpleEventBusData = { [key: string]: string | number | boolean | SimpleEventBusData };
+export type SimpleEventBusData = {
+    [key: string]: string | number | boolean | string[] | number[] | boolean[] | SimpleEventBusData
+};
 
 type StopListening = () => void;
 

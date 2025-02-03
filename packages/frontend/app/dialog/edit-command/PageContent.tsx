@@ -5,14 +5,16 @@ import {Commands, CommandSettings} from "@qommand/common/src/settings/commands.s
 import {recursiveMerge} from "@qommand/common/src/object";
 import {useSearchParams} from "next/navigation";
 import {getPathForFile} from "../../../utils/files";
-import {useButtonClick} from "../../../hooks/useButtonClick";
 import {useRequestResponse} from "../../../hooks/useRequestResponse";
 import {nodeRedRequestName, NodeRedRequestReq, NodeRedRequestRes} from '@qommand/common/src/requests/node-red.request'
+import {
+    windowManagerActionsRequestName,
+    WindowManagerActionsRequestReq,
+    WindowManagerActionsRequestRes
+} from '@qommand/common/src/requests/windowManagerActions.request'
 import {useEffect} from "react";
 
 export const PageContent = () => {
-    const {emitButtonClick} = useButtonClick();
-
     const searchParams = useSearchParams();
     const commandId = searchParams.get('commandId');
 
@@ -31,18 +33,49 @@ export const PageContent = () => {
 
     const CommandConfig = () => {
         const {
-            isLoading,
-            sendRequest,
-            response,
+            isLoading: isNodeRedLoading,
+            sendRequest: sendNodeRedRequest,
+            response: nodeRed,
         } = useRequestResponse<NodeRedRequestReq, NodeRedRequestRes>(nodeRedRequestName, {});
+        const {
+            isLoading: isActionsLoading,
+            sendRequest: sendActionsRequest,
+            response: windowManagerActions = {actions: []},
+        } = useRequestResponse<WindowManagerActionsRequestReq, WindowManagerActionsRequestRes>(windowManagerActionsRequestName, {});
+
+        const isLoading = isNodeRedLoading /* || isActionsLoading */;
+
+        console.log('data', {isActionsLoading, sendActionsRequest, windowManagerActions})
 
         useEffect(() => {
-            sendRequest()
+            sendNodeRedRequest();
+            sendActionsRequest();
         }, []);
 
         if (isLoading) return <div>Loading...</div>;
 
         switch (command.type) {
+            case 'window-management':
+                return (
+                    <>
+                        <label htmlFor='windowManagement'>
+                            Window Management Action
+                        </label>
+                        <select value={command.commandConfig.method} onChange={({currentTarget}) => updateCommand({
+                            commandConfig: {
+                                method: currentTarget.value,
+                            }
+                        })}>
+                            {
+                                windowManagerActions.actions.map(method => (
+                                    <option key={method} value={method}>
+                                        {method}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </>
+                )
             case 'node-red':
                 return <div className='h-full flex flex-col bg-slate-800'>
                     <div className='w-full'>
@@ -50,7 +83,7 @@ export const PageContent = () => {
                     </div>
                     <iframe
                         className='w-full h-full'
-                        src={`http://${response.host}:${response.port}${response.adminPath}`}
+                        src={`http://${nodeRed.host}:${nodeRed.port}${nodeRed.adminPath}`}
                     />
                 </div>
             case 'script':

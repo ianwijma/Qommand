@@ -18,6 +18,7 @@ import {keyboardShortcuts} from "./utils/keyboard-shortcuts";
 import {searchSettings} from "./settings/search.setting";
 import {commandRunner} from "./utils/commandRunner";
 import {nodeRed} from "./utils/nodeRed";
+// import {activeWindowManager} from "./utils/activeWindowManager";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -57,6 +58,7 @@ if (!isSingleInstance) {
         await nodeRed.initialize().catch(console.error);
         await keyboardShortcuts.initialize();
         await commandRunner.initialize();
+        // await activeWindowManager.initialize();
 
         if (isDev()) {
             await receiveWindow.initialize();

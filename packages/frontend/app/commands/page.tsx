@@ -122,6 +122,7 @@ export default function CommandsPage() {
 
                     commandsSettings.commands[newCommandId] = {
                         id: newCommandId,
+                        system: false,
                         icon: '',
                         name,
                         type: type,
@@ -317,7 +318,7 @@ export default function CommandsPage() {
             <button className='whitespace-nowrap' onClick={createCategory}>Add category</button>
         </div>
 
-        <div className='overflow-y-scroll'>
+        <div className='overflow-y-auto'>
             <table className="w-full bg-slate-700">
                 <thead className="sticky top-0 bg-slate-700">
                 <tr>

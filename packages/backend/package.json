@@ -18,7 +18,7 @@
     "@electron-forge/maker-rpm": "^7.6.0",
     "@electron-forge/maker-squirrel": "^7.6.0",
     "@electron-forge/maker-zip": "^7.6.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.6.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.6.1",
     "@electron-forge/plugin-fuses": "^7.6.0",
     "@electron-forge/plugin-vite": "^7.6.0",
     "@electron/fuses": "^1.8.0",
@@ -50,6 +50,7 @@
     "isolated-vm": "^5.0.3",
     "nanoid": "^5.0.9",
     "node-red": "^4.0.8",
+    "node-window-manager": "^2.2.4",
     "utf-8-validate": "^5.0.10",
     "yaml": "^2.6.1",
     "yargs-parser": "^21.1.1"

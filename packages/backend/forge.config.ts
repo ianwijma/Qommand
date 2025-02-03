@@ -12,7 +12,12 @@ const config: ForgeConfig = {
         asar: true,
     },
     rebuildConfig: {},
-    makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), /* new MakerRpm({}) ,*/ new MakerDeb({})],
+    makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), /* new MakerRpm({}) ,*/ new MakerDeb({
+        options: {
+            name: 'Qommand',
+            description: ''
+        }
+    })],
     plugins: [
         new VitePlugin({
             // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
@@ -48,6 +53,10 @@ const config: ForgeConfig = {
             [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
             [FuseV1Options.OnlyLoadAppFromAsar]: true,
         }),
+        {
+            name: '@electron-forge/plugin-auto-unpack-natives',
+            config: {}
+        }
     ],
 };
 
