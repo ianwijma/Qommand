@@ -13,7 +13,9 @@
   "license": "",
   "description": "Running Commands",
   "workspaces": [
-    "packages/*"
+    "packages/common",
+    "packages/frontend",
+    "packages/backend-webpack"
   ],
   "devDependencies": {
     "concurrently": "^9.1.0",
