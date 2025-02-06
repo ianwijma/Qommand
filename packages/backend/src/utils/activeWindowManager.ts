@@ -10,7 +10,7 @@ const createActiveWindowManager = () => {
     return {
         initialize: () => Promise.resolve(undefined),
         maximize: () => {
-            console.log('WINDOWS', {windows: windowManager.getWindows()});
+            console.log('DANK', {windows: windowManager.getWindows()})
             windowManager.getActiveWindow().maximize();
         }
     }

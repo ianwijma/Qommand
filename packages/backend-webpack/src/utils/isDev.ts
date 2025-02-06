@@ -1,1 +1,0 @@
-export const isDev = () => process.env.APP_ENV === 'dev';

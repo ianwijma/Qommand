@@ -15,7 +15,7 @@
   "workspaces": [
     "packages/common",
     "packages/frontend",
-    "packages/backend-webpack"
+    "packages/backend"
   ],
   "devDependencies": {
     "concurrently": "^9.1.0",

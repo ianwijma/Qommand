@@ -5,6 +5,7 @@ import {searchSettings} from "../settings/search.setting";
 import {Commands} from "@qommand/common/src/settings/commands.settings.types";
 import {runShell} from "../run-shell";
 import {runFile} from "../run-file";
+import {activeWindowManager} from "./activeWindowManager";
 
 const DAYS_AGO_UNIX = 30 * 24 * 3600;
 
@@ -48,6 +49,9 @@ const createCommandRunner = () => {
                     code: command.commandConfig.code
                 });
                 break;
+            case 'window-management':
+                const {commandConfig: {method}} = command;
+                await activeWindowManager[method]();
         }
 
         console.log('Command ran', {out})
