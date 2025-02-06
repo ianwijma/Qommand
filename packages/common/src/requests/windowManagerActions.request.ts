@@ -1,7 +1,7 @@
-import type {ActiveWindowManagerMethod} from "qommand/src/utils/activeWindowManager";
+import type {WindowManagerMethods} from "qommand/src/utils/windowManager";
 
 export const windowManagerActionsRequestName = 'windowManagerActionsRequest';
 
 export type WindowManagerActionsRequestReq = {};
 
-export type WindowManagerActionsRequestRes = { actions: ActiveWindowManagerMethod[] };
+export type WindowManagerActionsRequestRes = { actions: WindowManagerMethods[] };

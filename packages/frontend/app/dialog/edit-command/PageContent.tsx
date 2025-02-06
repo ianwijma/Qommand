@@ -43,7 +43,7 @@ export const PageContent = () => {
             response: windowManagerActions = {actions: []},
         } = useRequestResponse<WindowManagerActionsRequestReq, WindowManagerActionsRequestRes>(windowManagerActionsRequestName, {});
 
-        const isLoading = isNodeRedLoading /* || isActionsLoading */;
+        const isLoading = isNodeRedLoading || isActionsLoading;
 
         console.log('data', {isActionsLoading, sendActionsRequest, windowManagerActions})
 
@@ -61,11 +61,13 @@ export const PageContent = () => {
                         <label htmlFor='windowManagement'>
                             Window Management Action
                         </label>
-                        <select value={command.commandConfig.method} onChange={({currentTarget}) => updateCommand({
-                            commandConfig: {
-                                method: currentTarget.value,
-                            }
-                        })}>
+                        <select className='text-black' value={command.commandConfig.method ?? ''}
+                                onChange={({currentTarget}) => updateCommand({
+                                    commandConfig: {
+                                        method: currentTarget.value,
+                                    }
+                                })}>
+                            <option value='' disabled>-- No action selected --</option>
                             {
                                 windowManagerActions.actions.map(method => (
                                     <option key={method} value={method}>

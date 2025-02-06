@@ -18,7 +18,7 @@ import {keyboardShortcuts} from "./utils/keyboard-shortcuts";
 import {searchSettings} from "./settings/search.setting";
 import {commandRunner} from "./utils/commandRunner";
 import {nodeRed} from "./utils/nodeRed";
-import {activeWindowManager} from "./utils/activeWindowManager";
+import {windowManager} from "./utils/windowManager";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -54,11 +54,10 @@ if (!isSingleInstance) {
         await aboutWindow.initialize();
 
         // Background Processes
-        // TODO: Resolve post-build error: (node:224924) UnhandledPromiseRejectionWarning: Error: Cannot find module '@node-red/nodes'
         await nodeRed.initialize().catch(console.error);
         await keyboardShortcuts.initialize();
         await commandRunner.initialize();
-        await activeWindowManager.initialize();
+        await windowManager.initialize();
 
         if (isDev()) {
             await receiveWindow.initialize();

@@ -5,7 +5,7 @@ import {searchSettings} from "../settings/search.setting";
 import {Commands} from "@qommand/common/src/settings/commands.settings.types";
 import {runShell} from "../run-shell";
 import {runFile} from "../run-file";
-import {activeWindowManager} from "./activeWindowManager";
+import {windowManager} from "./windowManager";
 
 const DAYS_AGO_UNIX = 30 * 24 * 3600;
 
@@ -36,7 +36,7 @@ const createCommandRunner = () => {
     const runCommand = async (command: Commands) => {
         const {type} = command;
 
-        let out: string = '';
+        let out: any = '';
 
         switch (type) {
             case "script":
@@ -51,7 +51,7 @@ const createCommandRunner = () => {
                 break;
             case 'window-management':
                 const {commandConfig: {method}} = command;
-                await activeWindowManager[method]();
+                out = await windowManager[method]();
         }
 
         console.log('Command ran', {out})
