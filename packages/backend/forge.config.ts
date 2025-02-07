@@ -18,7 +18,7 @@ const config: ForgeConfig = {
     makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), /* new MakerRpm({}) ,*/ new MakerDeb({
         options: {
             name: 'Qommand',
-            description: ''
+            description: 'Qommand & Qonquer'
         }
     })],
     plugins: [
@@ -29,6 +29,8 @@ const config: ForgeConfig = {
                 config: preloadConfig,
                 entryPoints: [
                     {
+                        // html: "./index.html",
+                        // js: "./src/renderer.ts",
                         name: '../main',
                         preload: {
                             js: './src/preload.ts',

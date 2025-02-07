@@ -17,15 +17,25 @@ import {runnerWindow} from "./windows/runner.window";
 import {keyboardShortcuts} from "./utils/keyboard-shortcuts";
 import {searchSettings} from "./settings/search.setting";
 import {commandRunner} from "./utils/commandRunner";
-import {nodeRed} from "./utils/nodeRed";
 import {windowManager} from "./utils/windowManager";
+import fs from "fs/promises";
+import path from "path";
+
+(async () => {
+    console.log('DIRECTORY', {
+        dirname: __dirname,
+        mainDir: await fs.readdir(__dirname),
+        prevDir: await fs.readdir(path.join(__dirname, '..')),
+        resourceDir: await fs.readdir(path.join(__dirname, '..', 'renderer')),
+    });
+})();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
     app.quit();
 }
 
-let isSingleInstance = app.requestSingleInstanceLock()
+let isSingleInstance = app.requestSingleInstanceLock({isDev: isDev()});
 if (!isSingleInstance) {
     console.log('Qommand can only be opened once.')
     app.quit();
@@ -54,7 +64,6 @@ if (!isSingleInstance) {
         await aboutWindow.initialize();
 
         // Background Processes
-        await nodeRed.initialize().catch(console.error);
         await keyboardShortcuts.initialize();
         await commandRunner.initialize();
         await windowManager.initialize();

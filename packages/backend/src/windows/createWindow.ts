@@ -8,6 +8,10 @@ import {closeWindowEventName, type CloseWindowEventData} from '@qommand/common/s
 import {minimizeWindowEventName, type MinimizeWindowEventData} from '@qommand/common/src/events/minimizeWindow.event';
 import {StopListening} from "@qommand/common/src/eventbus.types";
 import {sleep} from "../utils/sleep";
+import fs from "fs/promises";
+
+declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 type UrlParams = Record<string, string>;
 
@@ -132,7 +136,7 @@ export const createWindow = ({
             return `http://localhost:8080/${route}`
         }
 
-        return path.join(__dirname, `../renderer/the_window/${route}.html`);
+        return path.join(__dirname, '..', 'renderer', `${route}.html`);
     }
     const loadWindow = async ({urlParams}: { urlParams: UrlParams }) => {
         isInitialized();
@@ -283,6 +287,8 @@ export const createWindow = ({
 
     const initialize = async () => {
         console.log(`Initializing ${title} window`);
+
+        console.log('WINDOW DIR', {renderer: await fs.readdir(path.join(__dirname, '..', 'renderer'))});
 
         window = new BrowserWindow({
             show: false,
