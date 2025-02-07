@@ -18,17 +18,6 @@ import {keyboardShortcuts} from "./utils/keyboard-shortcuts";
 import {searchSettings} from "./settings/search.setting";
 import {commandRunner} from "./utils/commandRunner";
 import {windowManager} from "./utils/windowManager";
-import fs from "fs/promises";
-import path from "path";
-
-(async () => {
-    console.log('DIRECTORY', {
-        dirname: __dirname,
-        mainDir: await fs.readdir(__dirname),
-        prevDir: await fs.readdir(path.join(__dirname, '..')),
-        resourceDir: await fs.readdir(path.join(__dirname, '..', 'renderer')),
-    });
-})();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
