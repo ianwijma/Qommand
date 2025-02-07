@@ -129,10 +129,10 @@ export const createWindow = ({
         isInitialized();
 
         if (isDev()) {
-            return `http://localhost:3000/${route}`
+            return `http://localhost:8080/${route}`
         }
 
-        return path.join(__dirname, `../renderer/the_window/${route}.html`);
+        return path.join(__dirname, '..', 'renderer', `${route}.html`);
     }
     const loadWindow = async ({urlParams}: { urlParams: UrlParams }) => {
         isInitialized();

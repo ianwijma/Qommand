@@ -16,7 +16,7 @@ try {
 
     echo`~~~ Cleaning up previous build files...`
     await Promise.allSettled([
-        $`rm -r packages/backend/.vite`,
+        $`rm -r packages/backend/.webpack`,
         $`rm -r packages/backend/out`,
         $`rm -r packages/frontend/.next`,
         $`rm -r packages/frontend/out`,
@@ -32,11 +32,11 @@ try {
 
     // Ensure the frontend build ends up in the backend build output folder.
     const feInterval = setInterval(async () => {
-        const frontendIsPresent = await fs.pathExists('packages/backend/.vite/renderer/the_window/')
+        const frontendIsPresent = await fs.pathExists('packages/backend/.webpack/renderer/')
         if (!frontendIsPresent) {
             echo`~~~ Copy compiled frontend packages into the backend renderer build folder...`
-            await $`mkdir -p packages/backend/.vite/renderer/the_window/`
-            await $`cp -r packages/frontend/out/* packages/backend/.vite/renderer/the_window/`;
+            await $`mkdir -p packages/backend/.webpack/renderer/`
+            await $`cp -r packages/frontend/out/* packages/backend/.webpack/renderer/`;
         }
     }, 100)
 

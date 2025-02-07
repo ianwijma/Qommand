@@ -1,6 +1,6 @@
 import {BaseSettings} from "../settings.types";
 import {SimpleEventBusData} from "../eventbus.types";
-import {activeWindowManager} from "qommand/src/utils/activeWindowManager";
+import {WindowManagerMethods} from "qommand/src/utils/windowManager";
 
 export type CommandId = string;
 
@@ -39,7 +39,7 @@ export type WindowManagementCommand = BaseCommand & {
     type: 'window-management';
     system: true;
     commandConfig: {
-        method: keyof typeof activeWindowManager
+        method: WindowManagerMethods
     };
 }
 
