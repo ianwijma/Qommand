@@ -119,6 +119,17 @@ export const confirmDialog = createDialog<ConfirmParams, ConfirmReturn>({
     route: 'dialog/confirm',
 });
 
+type MessageParams = {
+    title?: string;
+    message: string;
+};
+type MessageReturn = {};
+
+export const messageDialog = createDialog<MessageParams, MessageReturn>({
+    title: 'Message Dialog',
+    route: 'dialog/message',
+});
+
 type EditCommandParams = {
     commandId: string;
     title: string;
@@ -139,6 +150,7 @@ const dialogMap = {
     input: inputDialog,
     'create-command': createCommandDialog,
     'confirm': confirmDialog,
+    'message': messageDialog,
     'edit-command': editCommandDialog,
 }
 
@@ -149,7 +161,6 @@ responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogReques
     if (type in dialogMap) {
         const dialogHandler = dialogMap[type];
 
-        // @ts-expect-error - rest is always correct
         return dialogHandler.open(rest)
     }
 

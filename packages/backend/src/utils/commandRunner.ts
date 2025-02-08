@@ -67,8 +67,6 @@ const createCommandRunner = () => {
                 if (commandId in commands) {
                     const command = commands[commandId];
 
-                    console.log('Running command', {command});
-
                     await Promise.all([
                         // Run the command
                         runCommand(command),
