@@ -161,6 +161,7 @@ responseHandler.handleResponse<DialogRequestReq<OpenDialogOptions>, DialogReques
     if (type in dialogMap) {
         const dialogHandler = dialogMap[type];
 
+        // @ts-expect-error - Unable to understand what the rest it, probably should be fixed at some points.
         return dialogHandler.open(rest)
     }
 

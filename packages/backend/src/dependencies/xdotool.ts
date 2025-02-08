@@ -1,19 +1,3 @@
-import {InstallableDependency} from "./dependencies.types";
-import {messageDialog} from "../windows/dialog.window";
+import {createInstallableLinuxCliDependency} from "./dependencies";
 
-export type Xdotool = InstallableDependency & {}
-
-export const xdotool = (): Xdotool => {
-    return {
-        isInstallable: () => process.platform === 'linux',
-        install: () => {
-            messageDialog.open({message: 'Please install xdotool for your distro'})
-        },
-        isInstalled: async () => {
-
-        },
-        run: async (...args) => {
-
-        }
-    }
-}
+export const xdotool = createInstallableLinuxCliDependency('xdotool');
