@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "node bin/dev.js",
-    "build": "node bin/build.js",
-    "build-quick": "node bin/build.js --quick",
-    "reset": "node bin/reset.js",
+    "dev": "node bin/dev.mjs",
+    "build": "node bin/build.mjs",
+    "build-quick": "node bin/build.mjs --quick",
+    "reset": "node bin/reset.mjs",
     "postinstall": "patch-package"
   },
   "author": "Ian Wijma (https://ian.wij.ma/)",

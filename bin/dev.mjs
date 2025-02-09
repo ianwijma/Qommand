@@ -1,7 +1,11 @@
-const concurrently = require('concurrently');
-const path = require("path");
+import 'zx/globals';
+import concurrently from "concurrently";
+import path from "path";
+import {fileURLToPath} from "url";
 
-const QOMMAND_ROOT = path.resolve(__dirname, '..')
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
+const QOMMAND_ROOT = path.resolve(__dirname, '..');
 
 const {result} = concurrently(
     [
