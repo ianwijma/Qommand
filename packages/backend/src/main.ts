@@ -18,6 +18,7 @@ import {keyboardShortcuts} from "./utils/keyboard-shortcuts";
 import {searchSettings} from "./settings/search.setting";
 import {commandRunner} from "./utils/commandRunner";
 import {windowManager} from "./utils/windowManager";
+import {clipboardHistorySettings} from "./settings/clipboard-history.setting";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -42,6 +43,7 @@ if (!isSingleInstance) {
         await commandsFolderSettings.initialize();
         await commandsSettings.initialize();
         await searchSettings.initialize();
+        await clipboardHistorySettings.initialize();
 
         if (startupArguments.reset) {
             await resetAllSettings();
