@@ -8,6 +8,7 @@ import {commandsWindow} from "../windows/commands.window";
 import {defaultLogo} from '@qommand/common/src/logos'
 import {aboutWindow} from "../windows/about.window";
 import {runnerWindow} from "../windows/runner.window";
+import {clipboardHistoryWindow} from "../windows/clipboard-history.window";
 
 export const defaultTray = {
     async initialize() {
@@ -47,6 +48,11 @@ export const defaultTray = {
                 label: 'Toggle Runner',
                 type: 'normal',
                 click: () => runnerWindow.toggle()
+            },
+            {
+                label: 'Toggle clipboard history',
+                type: 'normal',
+                click: () => clipboardHistoryWindow.toggle()
             },
             {
                 label: 'About',

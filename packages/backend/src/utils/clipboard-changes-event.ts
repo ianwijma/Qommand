@@ -46,15 +46,24 @@ const createClipboardChanges = () => {
 
     let intervalId: undefined | number;
 
+    let htmlHash: string;
+    let textHash: string;
+    let imageHash: string;
+
     return {
+        updateHash: ({text, html, image}: { text?: string, html?: string, image?: string }) => {
+            htmlHash = !!html ? hash(html) : EMPTY_HASH;
+            textHash = !!text ? hash(text) : EMPTY_HASH;
+            imageHash = !!image ? hash(image) : EMPTY_HASH;
+        },
         startListening: async () => {
             const htmlInitial = clipboard.readHTML('clipboard');
             const textInitial = clipboard.readText('clipboard');
             const imageInitial = clipboard.readImage('clipboard');
 
-            let htmlHash = hash(htmlInitial);
-            let textHash = hash(textInitial);
-            let imageHash = hash(imageInitial.toDataURL());
+            htmlHash = hash(htmlInitial);
+            textHash = hash(textInitial);
+            imageHash = hash(imageInitial.toDataURL());
 
             if (!intervalId) {
                 // @ts-expect-error - Expects a NodeJS.Timeout?

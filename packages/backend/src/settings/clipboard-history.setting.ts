@@ -7,6 +7,12 @@ import {clipboardChanges} from "../utils/clipboard-changes-event";
 import zlib from "node:zlib";
 import {Buffer} from "node:buffer";
 import {promisify} from 'node:util';
+import {eventHandler} from "../utils/eventHandler";
+import {
+    restoreClipboardHistoryEventName, RestoreClipboardHistoryEventData
+} from "@qommand/common/src/events/restoreClipboardHistory.event";
+import {clipboard, nativeImage} from "electron";
+
 
 const compressPromiseFn = promisify(zlib.deflate);
 const decompressPromiseFn = promisify(zlib.inflate);
@@ -104,6 +110,7 @@ clipboardChanges.onChange(async (event) => {
         case 'text': {
             const {text, textHash} = event;
             const id = textHash;
+            // TODO: Fix large text being compressed one way.
             await addClipboardHistoryItem({type, id, textHash, text});
         }
             break;
@@ -123,4 +130,47 @@ clipboardChanges.onChange(async (event) => {
             console.log(`Unsupported event type ${type}`);
         }
     }
-})
+});
+
+eventHandler.listen<RestoreClipboardHistoryEventData>(restoreClipboardHistoryEventName, async ({clipboardHistoryItemHashId}) => {
+    const settings = clipboardHistorySettings.getSettings();
+    const {clipboardHistory} = settings;
+
+    const [targetClipboardHistoryItem = undefined] = clipboardHistory.filter(({id}) => id === clipboardHistoryItemHashId);
+    if (targetClipboardHistoryItem) {
+        const {type} = targetClipboardHistoryItem;
+        switch (type) {
+            case 'text': {
+                const {text} = targetClipboardHistoryItem;
+                clipboardChanges.updateHash({text});
+                clipboard.writeText(text, 'clipboard');
+            }
+                break;
+            case 'html': {
+                const {html, text} = targetClipboardHistoryItem;
+                clipboardChanges.updateHash({html, text});
+                // TODO: Writing HTML does not seem to work, Writing text does seems to work
+                clipboard.writeText(text, 'clipboard');
+            }
+                break;
+            case 'image': {
+                const {image} = targetClipboardHistoryItem;
+                clipboardChanges.updateHash({image});
+                const imageNative = nativeImage.createFromDataURL(image);
+                // TODO: A lot of images are HTML elements when copied from the web...
+                clipboard.writeImage(imageNative, 'clipboard');
+            }
+                // TODO: Add copying files, maybe?
+                break;
+        }
+
+        const filteredHistory = clipboardHistory.filter(({id}) => id !== clipboardHistoryItemHashId);
+        await clipboardHistorySettings.updateSettings({
+            ...settings,
+            clipboardHistory: [
+                targetClipboardHistoryItem,
+                ...filteredHistory
+            ]
+        })
+    }
+});
