@@ -1,5 +1,5 @@
 import EventEmitter from "node:events";
-import {clipboard, nativeImage, NativeImage} from "electron";
+import {clipboard, NativeImage} from "electron";
 import {createHash} from 'node:crypto';
 
 const hash = (input: string): string => {
@@ -51,10 +51,6 @@ const createClipboardChanges = () => {
             const htmlInitial = clipboard.readHTML('clipboard');
             const textInitial = clipboard.readText('clipboard');
             const imageInitial = clipboard.readImage('clipboard');
-
-            console.log('Initial Check', {
-                htmlInitial, textInitial
-            })
 
             let htmlHash = hash(htmlInitial);
             let textHash = hash(textInitial);
