@@ -1,6 +1,6 @@
 import {BaseClipboardHistoryItemHashId} from "../settings/clipboard-history.settings.types";
 
-export const restoreClipboardHistoryEventName = 'updateSettings';
+export const restoreClipboardHistoryEventName = 'restoreClipboardHistory';
 
 export type RestoreClipboardHistoryEventData = {
     clipboardHistoryItemHashId: BaseClipboardHistoryItemHashId;
