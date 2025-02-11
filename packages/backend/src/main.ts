@@ -1,4 +1,4 @@
-import {app} from 'electron';
+import {app, clipboard} from 'electron';
 import started from 'electron-squirrel-startup';
 import {receiveWindow} from "./windows/receive.window";
 import {sendWindow} from "./windows/send.window";
@@ -19,6 +19,7 @@ import {searchSettings} from "./settings/search.setting";
 import {commandRunner} from "./utils/commandRunner";
 import {windowManager} from "./utils/windowManager";
 import {clipboardHistorySettings} from "./settings/clipboard-history.setting";
+import {clipboardChanges} from "./utils/clipboard-changes-event";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -58,6 +59,7 @@ if (!isSingleInstance) {
         await keyboardShortcuts.initialize();
         await commandRunner.initialize();
         await windowManager.initialize();
+        await clipboardChanges.startListening();
 
         if (isDev()) {
             await receiveWindow.initialize();

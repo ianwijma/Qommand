@@ -1,5 +1,5 @@
 import EventEmitter from "node:events";
-import {clipboard, NativeImage} from "electron";
+import {clipboard, nativeImage, NativeImage} from "electron";
 import {createHash} from 'node:crypto';
 
 const hash = (input: string): string => {
@@ -9,25 +9,45 @@ const hash = (input: string): string => {
 }
 
 type ClipboardChangeEventTypes = 'text' | 'image' | 'html';
-type ClipboardChangeData = string | NativeImage;
-type ClipboardChangesEventDetails = { type: ClipboardChangeEventTypes, clipboard: ClipboardChangeData };
-type ClipboardChangesEvent = CustomEvent<ClipboardChangesEventDetails>;
+type ClipboardChangeBaseEvent = {
+    type: ClipboardChangeEventTypes,
+}
+
+type ClipboardTextChangeEvent = ClipboardChangeBaseEvent & {
+    type: 'text';
+    text: string;
+    textHash: string;
+}
+
+type ClipboardHtmlChangeEvent = ClipboardChangeBaseEvent & {
+    type: 'html';
+    text: string;
+    textHash: string;
+    html: string;
+    htmlHash: string;
+}
+
+type ClipboardImageChangeEvent = ClipboardChangeBaseEvent & {
+    type: 'image';
+    image: NativeImage;
+    imageHash: string;
+}
+
+type ClipboardChangeEvents = ClipboardTextChangeEvent | ClipboardHtmlChangeEvent | ClipboardImageChangeEvent;
+
+const EMPTY_HASH = 'empty::hash'
 
 const createClipboardChanges = () => {
     const eventEmitter = new EventEmitter();
 
-    const emit = (type: ClipboardChangeEventTypes, clipboard: ClipboardChangeData) => {
-        const event = new CustomEvent<ClipboardChangesEventDetails>('change', {
-            detail: {type, clipboard},
-        });
-
-        eventEmitter.emit<ClipboardChangesEvent>('change', event);
+    const emitEvent = (event: ClipboardChangeEvents) => {
+        eventEmitter.emit<ClipboardImageChangeEvent>('change', event);
     }
 
     let intervalId: undefined | number;
 
     return {
-        startListening: () => {
+        startListening: async () => {
             const htmlInitial = clipboard.readHTML('clipboard');
             const textInitial = clipboard.readText('clipboard');
             const imageInitial = clipboard.readImage('clipboard');
@@ -44,28 +64,50 @@ const createClipboardChanges = () => {
                 // @ts-expect-error - Expects a NodeJS.Timeout?
                 intervalId = setInterval(() => {
                     const html = clipboard.readHTML('clipboard');
-                    const text = clipboard.readText('clipboard');
-                    const image = clipboard.readImage('clipboard');
-                    
-                    const newHtmlHash = hash(html);
-                    const newTextHash = hash(text);
-                    const newImageHash = hash(image.toDataURL());
+                    if (html !== '') {
+                        const newHtmlHash = hash(html);
+                        if (newHtmlHash !== htmlHash) {
+                            const htmlText = clipboard.readText('clipboard');
+                            textHash = hash(htmlText);
+                            htmlHash = newHtmlHash;
+                            imageHash = EMPTY_HASH;
+                            emitEvent({type: 'html', html, htmlHash, text: htmlText, textHash});
+                        }
 
-                    console.log('check-change', {
-                        text, html
-                    })
-
-                    if (newHtmlHash !== htmlHash) {
-                        htmlHash = newHtmlHash;
-                        emit('html', html);
-                    } else if (newTextHash !== textHash) {
-                        textHash = newTextHash;
-                        emit('text', text);
-                    } else if (newImageHash !== imageHash) {
-                        imageHash = newImageHash;
-                        emit('image', image);
+                        return; // Handled
                     }
-                }, 2500);
+
+                    const text = clipboard.readText('clipboard');
+                    if (text !== '') {
+                        const newTextHash = hash(text);
+                        if (newTextHash !== textHash) {
+                            textHash = newTextHash;
+                            htmlHash = EMPTY_HASH;
+                            imageHash = EMPTY_HASH;
+                            emitEvent({type: 'text', text, textHash});
+                        }
+
+                        return; // Handled
+                    }
+
+                    const image = clipboard.readImage('clipboard');
+                    if (image.isEmpty()) {
+                        const newImageHash = hash(image.toDataURL());
+                        if (newImageHash !== imageHash) {
+                            textHash = EMPTY_HASH;
+                            htmlHash = EMPTY_HASH;
+                            imageHash = newImageHash;
+                            emitEvent({type: 'image', image, imageHash});
+                        }
+
+                        return; // Handled
+                    }
+
+                    textHash = EMPTY_HASH;
+                    htmlHash = EMPTY_HASH;
+                    imageHash = EMPTY_HASH;
+                    console.log('Clearing Hash', {text, html, image: image.isEmpty()});
+                }, 250);
             }
         },
         stopListening: () => {
@@ -75,10 +117,8 @@ const createClipboardChanges = () => {
                 clearInterval(intervalId);
             }
         },
-        onChange: (callback: (type: ClipboardChangeEventTypes) => Promise<void> | void) => {
-            eventEmitter.on<ClipboardChangesEvent>('change', (event) => {
-                console.log('event', {event});
-            });
+        onChange: (callback: (event: ClipboardChangeEvents) => Promise<void> | void) => {
+            eventEmitter.on<ClipboardChangeEvents>('change', callback);
         }
     }
 }

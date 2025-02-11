@@ -1,14 +1,32 @@
 import {BaseSettings} from "../settings.types";
 
-export type BaseClipboardHistoryItem = {}
+export type BaseClipboardHistoryItemHashId = string; // Items main hash
+export type BaseClipboardHistoryItemTypes = 'text' | 'html' | 'image'
+export type BaseClipboardHistoryItem = {
+    type: BaseClipboardHistoryItemTypes;
+    id: BaseClipboardHistoryItemHashId;
+}
 
-export type ClipboardHistoryItemText = BaseClipboardHistoryItem & {}
-export type ClipboardHistoryItemHtml = BaseClipboardHistoryItem & {}
-export type ClipboardHistoryItemImage = BaseClipboardHistoryItem & {}
+export type ClipboardHistoryItemText = BaseClipboardHistoryItem & {
+    type: 'text';
+    text: string;
+    textHash: string;
+}
+export type ClipboardHistoryItemHtml = BaseClipboardHistoryItem & {
+    type: 'html';
+    html: string;
+    htmlHash: string;
+    text: string;
+    textHash: string;
+}
+export type ClipboardHistoryItemImage = BaseClipboardHistoryItem & {
+    type: 'image';
+    image: string;
+    imageHash: string;
+}
 
-export type ClipboardHistoryItem = ClipboardHistoryItemText | ClipboardHistoryItemHtml | ClipboardHistoryItemImage
+export type ClipboardHistoryItems = ClipboardHistoryItemText | ClipboardHistoryItemHtml | ClipboardHistoryItemImage
 
 export type ClipboardHistorySettings = BaseSettings & {
-    selectionHistory: ClipboardHistoryItem[];
-    clipboardHistory: ClipboardHistoryItem[];
+    clipboardHistory: ClipboardHistoryItems[];
 };
