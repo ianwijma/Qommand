@@ -185,7 +185,15 @@ export default function ClipboardHistoryPage() {
                                     className='w-full h-10 flex items-center px-2 truncate'
                                     onClick={() => restoreClipboardItem(id)}
                                 >
-                                    {type === 'image' ? <img src={title} alt='Clipboard image content'/> : title}
+                                    {
+                                        type === 'image'
+                                            ? (
+                                                <>
+                                                    Image: <img className='h-9' src={title} alt='Clipboard image content'/>
+                                                </>
+                                            )
+                                            : title
+                                    }
                                 </button>
                                 <button
                                     className='h-10 w-10 hover:bg-slate-500'
@@ -199,13 +207,17 @@ export default function ClipboardHistoryPage() {
                 })}
                 {totalAmount > 0 ? (
                     <li className='w-full h-10 text-black flex text-xl bg-red-300 hover:bg-red-400 rounded-2xl'>
-                        <button className='w-full h-10 flex items-center px-2'
-                                onClick={() => removeAllClipboardItems()}>
+                        <button
+                            className='w-full h-10 flex items-center px-2'
+                            onClick={() => removeAllClipboardItems()}
+                        >
                             Clear history
                         </button>
                     </li>
                 ) : (
-                    <li className='w-full h-10 text-gray-500 text-xl bg-white flex items-center px-2 rounded-2xl'>
+                    <li
+                        className='w-full h-10 text-gray-500 text-xl bg-white flex items-center px-2 rounded-2xl'
+                    >
                         Nothing in your clipboard history yet.
                     </li>
                 )}
