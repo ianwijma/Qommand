@@ -161,7 +161,6 @@ eventHandler.listen<RestoreClipboardHistoryEventData>(restoreClipboardHistoryEve
                 const {image} = targetClipboardHistoryItem;
                 clipboardChanges.updateHash({image});
                 const imageNative = nativeImage.createFromDataURL(image);
-                // TODO: A lot of images are HTML elements when copied from the web...
                 clipboard.writeImage(imageNative, 'clipboard');
             }
                 break;
