@@ -68,6 +68,21 @@ const createClipboardChanges = () => {
 
             if (!intervalId) {
                 intervalId = setInterval(() => {
+                    // First we check if we have an image.
+                    const image = clipboard.readImage('clipboard');
+                    if (!image.isEmpty()) {
+                        const newImageHash = hash(image.toDataURL());
+                        if (newImageHash !== imageHash) {
+                            textHash = EMPTY_HASH;
+                            htmlHash = EMPTY_HASH;
+                            imageHash = newImageHash;
+                            emitEvent({type: 'image', image, imageHash});
+                        }
+
+                        return; // Handled
+                    }
+
+                    // Then we check if we have HTML in our clipboard.
                     const html = clipboard.readHTML('clipboard');
                     if (html !== '') {
                         const newHtmlHash = hash(html);
@@ -82,6 +97,7 @@ const createClipboardChanges = () => {
                         return; // Handled
                     }
 
+                    // lastly we check if we have text in our clipboard.
                     const text = clipboard.readText('clipboard');
                     if (text !== '') {
                         const newTextHash = hash(text);
@@ -95,19 +111,7 @@ const createClipboardChanges = () => {
                         return; // Handled
                     }
 
-                    const image = clipboard.readImage('clipboard');
-                    if (image.isEmpty()) {
-                        const newImageHash = hash(image.toDataURL());
-                        if (newImageHash !== imageHash) {
-                            textHash = EMPTY_HASH;
-                            htmlHash = EMPTY_HASH;
-                            imageHash = newImageHash;
-                            emitEvent({type: 'image', image, imageHash});
-                        }
-
-                        return; // Handled
-                    }
-
+                    // Else reset our current hashes.
                     textHash = EMPTY_HASH;
                     htmlHash = EMPTY_HASH;
                     imageHash = EMPTY_HASH;
