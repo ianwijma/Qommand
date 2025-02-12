@@ -2,6 +2,8 @@ import {confirmDialog} from "../windows/dialog.window";
 import {commandsFolderSettings} from "../settings/folders.settings";
 import {commandsSettings} from "../settings/commands.setting";
 import {keyboardSettings} from "../settings/keyboard.setting";
+import {clipboardHistorySettings} from "../settings/clipboard-history.setting";
+import {searchSettings} from "../settings/search.setting";
 
 export const resetAllSettings = async () => {
     const {confirmed} = await confirmDialog.open({
@@ -13,5 +15,7 @@ export const resetAllSettings = async () => {
         await keyboardSettings.resetSettings();
         await commandsFolderSettings.resetSettings();
         await commandsSettings.resetSettings();
+        await searchSettings.resetSettings();
+        await clipboardHistorySettings.resetSettings();
     }
 }

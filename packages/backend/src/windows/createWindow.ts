@@ -212,6 +212,8 @@ export const createWindow = ({
     }
 
     const toggle = async ({urlParams}: OpenParams = {}) => {
+        isInitialized();
+        
         if (window.isVisible()) {
             await close();
         } else {

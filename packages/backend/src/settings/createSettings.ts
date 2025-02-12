@@ -15,6 +15,8 @@ export type SettingsName = string;
 type CreateSettingParams<T> = {
     name: SettingsName;
     defaultSettings: Omit<T, "name">;
+    preSaveFn?: (data: T) => Promise<T> | T;
+    postLoadFn?: (data: T) => Promise<T> | T;
 }
 
 export type CreateSettingReturn<T> = {
@@ -28,7 +30,9 @@ export type CreateSettingReturn<T> = {
 
 export const createSettings = <T extends BaseSettings>({
                                                            name,
-                                                           defaultSettings
+                                                           defaultSettings,
+                                                           preSaveFn = (data) => data,
+                                                           postLoadFn = (data) => data,
                                                        }: CreateSettingParams<T>): CreateSettingReturn<T> => {
     const actuallyDefaultSettings: T = {name, ...defaultSettings} as T;
     const settingsFilePath = `settings/${name}.yaml`;
@@ -56,11 +60,15 @@ export const createSettings = <T extends BaseSettings>({
             await writeYamlFile<T>(settingsFilePath, actuallyDefaultSettings);
         }
 
-        settingsCache = await readYamlFile<T>(settingsFilePath);
+        const settings = await readYamlFile<T>(settingsFilePath);
+
+        settingsCache = await postLoadFn(settings);
     }
 
     const updateSettings = async (settingToUpdate: T): Promise<T> => {
-        await writeYamlFile<T>(settingsFilePath, settingToUpdate);
+        const formattedSettings = await preSaveFn(settingToUpdate);
+
+        await writeYamlFile<T>(settingsFilePath, formattedSettings);
 
         await syncSettings();
 

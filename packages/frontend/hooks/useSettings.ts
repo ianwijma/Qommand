@@ -35,8 +35,6 @@ export const useSettings = <T extends BaseSettings>(settingsName: SettingsName) 
         const {updatedSettings} = response;
         const {name} = updatedSettings;
 
-        // TODO: This does not seem to trigger / work anymore
-
         if (name === settingsName) {
             console.log('Setting Updated', {
                 settingsName,

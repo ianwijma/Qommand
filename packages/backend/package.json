@@ -1,7 +1,7 @@
 {
   "name": "qommand",
   "productName": "qommand",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Qommand & Qonquer",
   "main": ".webpack/main",
   "scripts": {

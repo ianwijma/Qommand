@@ -5,6 +5,7 @@ import {globalShortcut} from 'electron'
 import {runnerWindow} from "../windows/runner.window";
 import {eventHandler} from "./eventHandler";
 import {CommandId} from "@qommand/common/src/settings/commands.settings.types";
+import {clipboardHistoryWindow} from "../windows/clipboard-history.window";
 
 export type KeyboardShortcuts = {
     initialize: () => Promise<void>,
@@ -18,7 +19,11 @@ const createKeyboardShortcuts = (): KeyboardShortcuts => {
     const handleWindow = async (id: string) => {
         switch (id) {
             case 'runner':
-                await runnerWindow.toggle()
+                await runnerWindow.toggle();
+                break;
+            case 'clipboard-history':
+                await clipboardHistoryWindow.toggle();
+                break;
         }
     }
 
