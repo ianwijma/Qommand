@@ -36,12 +36,13 @@ type ClipboardImageChangeEvent = ClipboardChangeBaseEvent & {
 type ClipboardChangeEvents = ClipboardTextChangeEvent | ClipboardHtmlChangeEvent | ClipboardImageChangeEvent;
 
 const EMPTY_HASH = 'empty::hash'
+const CLIPBOARD_CHECK_INTERVAL_MS = 250;
 
 const createClipboardChanges = () => {
     const eventEmitter = new EventEmitter();
 
     const emitEvent = (event: ClipboardChangeEvents) => {
-        eventEmitter.emit<ClipboardImageChangeEvent>('change', event);
+        eventEmitter.emit<ClipboardChangeEvents>('change', event);
     }
 
     let intervalId: NodeJS.Timeout | undefined;
@@ -111,7 +112,7 @@ const createClipboardChanges = () => {
                     htmlHash = EMPTY_HASH;
                     imageHash = EMPTY_HASH;
                     console.log('Clearing Hash', {text, html, image: image.isEmpty()});
-                }, 250);
+                }, CLIPBOARD_CHECK_INTERVAL_MS);
             }
         },
         stopListening: () => {
