@@ -1,10 +1,11 @@
 'use client';
 
 import {useSettings} from "../../hooks/useSettings";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useWindowControls} from "../../hooks/useWindowControls";
 import {
-    BaseClipboardHistoryItemHashId, BaseClipboardHistoryItemTypes,
+    ClipboardHistoryItemHashId,
+    ClipboardHistoryItemTypes,
     ClipboardHistorySettings
 } from "@qommand/common/src/settings/clipboard-history.settings.types";
 import {eventHandler} from "../../utils/eventHandler";
@@ -12,19 +13,22 @@ import {
     RestoreClipboardHistoryEventData,
     restoreClipboardHistoryEventName
 } from '@qommand/common/src/events/restoreClipboardHistory.event'
+import {
+    ClearClipboardHistoryEventData,
+    clearClipboardHistoryEventName
+} from '@qommand/common/src/events/clearClipboardHistory.event'
 
 type SearchableClipboardHistoryItems = {
-    id: BaseClipboardHistoryItemHashId;
-    type: BaseClipboardHistoryItemTypes;
+    id: ClipboardHistoryItemHashId;
+    type: ClipboardHistoryItemTypes;
     title: string;
     searchableText: string;
 }
 
 type Result = {
-    id: BaseClipboardHistoryItemHashId;
-    type: BaseClipboardHistoryItemTypes;
+    id: ClipboardHistoryItemHashId;
+    type: ClipboardHistoryItemTypes;
     title: string;
-    callback: () => void;
 }
 
 export default function AboutPage() {
@@ -36,6 +40,26 @@ export default function AboutPage() {
     const resetSelected = () => setSelected(0);
 
     const {isLoading, settings} = useSettings<ClipboardHistorySettings>('clipboard');
+
+    const restoreClipboardItem = useCallback((id: ClipboardHistoryItemHashId) => {
+        eventHandler.emit<RestoreClipboardHistoryEventData>(restoreClipboardHistoryEventName, {clipboardHistoryItemHashId: id});
+
+        close();
+    }, [settings]);
+
+    const removeClipboardItem = useCallback((id: ClipboardHistoryItemHashId) => {
+        eventHandler.emit<ClearClipboardHistoryEventData>(clearClipboardHistoryEventName, {ids: [id]});
+    }, [settings]);
+
+    const removeAllClipboardItems = useCallback(async () => {
+        const {clipboardHistory} = settings;
+
+        eventHandler.emit<ClearClipboardHistoryEventData>(clearClipboardHistoryEventName, {
+            ids: clipboardHistory.map(({id}) => id),
+        });
+
+        close();
+    }, [settings]);
 
     const searchableClipboardHistory = useMemo<SearchableClipboardHistoryItems[]>(() => {
         if (isLoading) return [];
@@ -70,13 +94,7 @@ export default function AboutPage() {
     }, [settings]);
 
     const results = useMemo<Result[]>(() => {
-        const toResult = ({id, type, title}) => ({
-            id, type, title, callback: () => {
-                eventHandler.emit<RestoreClipboardHistoryEventData>(restoreClipboardHistoryEventName, {clipboardHistoryItemHashId: id});
-
-                close();
-            }
-        });
+        const toResult = ({id, type, title}) => ({id, type, title});
 
         const isSearching = query.trim() !== '';
         if (isSearching) {
@@ -94,11 +112,11 @@ export default function AboutPage() {
         resetSelected()
     }, [query]);
 
+    const totalAmount = searchableClipboardHistory.length;
     const resultAmount = results.length;
-
-    const increaseSelected = () => selected < resultAmount && setSelected(selected + 1);
-    const decreaseSelected = () => selected !== 0 && setSelected(selected - 1);
-    const confirmSelected = () => results[selected].callback();
+    const increaseSelected = useCallback(() => selected < (resultAmount - 1) && setSelected(selected + 1), [selected, resultAmount, setSelected]);
+    const decreaseSelected = useCallback(() => selected !== 0 && setSelected(selected - 1), [selected, setSelected]);
+    const confirmSelected = useCallback(() => restoreClipboardItem(results[selected].id), [results, selected, restoreClipboardItem]);
 
     useEffect(() => {
         if (!inputRef.current) return;
@@ -131,7 +149,7 @@ export default function AboutPage() {
 
         if (!selectedEl) return;
 
-        selectedEl.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        selectedEl.scrollIntoView({block: 'nearest'});
     }, [selectedRef, selected]);
 
     // TODO: Make only the container and sub-items interactible: https://stackoverflow.com/a/78050093
@@ -145,7 +163,7 @@ export default function AboutPage() {
         </div>
         <div className="w-11/12 p-3 bg-slate-700 rounded-b-3xl max-h-[800px] overflow-x-hidden">
             <ul className="flex flex-col gap-1">
-                {results.map(({title, id, type, callback}: Result, index) => {
+                {results.map(({title, id, type}: Result, index) => {
                     let roundTop = true;
                     let roundBottom = true;
                     if (resultAmount > 1) {
@@ -162,14 +180,36 @@ export default function AboutPage() {
 
                     return (
                         <li key={id} ref={isSelected ? selectedRef : null}>
-                            <button
-                                onClick={() => callback()}
-                                className={`w-full text-black flex items-center text-xl h-10 px-2 truncate hover:bg-slate-400 ${roundTop ? 'rounded-t-2xl' : ''} ${roundBottom ? 'rounded-b-2xl' : ''} ${isSelected ? 'bg-slate-300' : 'bg-white'}`}>
-                                {type === 'image' ? <img src={title} alt='image'/> : title}
-                            </button>
+                            <div
+                                className={`w-full h-10 text-black flex text-xl hover:bg-slate-400 overflow-hidden ${roundTop ? 'rounded-t-2xl' : ''} ${roundBottom ? 'rounded-b-2xl' : ''} ${isSelected ? 'bg-slate-300' : 'bg-white'}`}>
+                                <button
+                                    className='w-full h-10 flex items-center px-2 truncate'
+                                    onClick={() => restoreClipboardItem(id)}
+                                >
+                                    {type === 'image' ? <img src={title} alt='image'/> : title}
+                                </button>
+                                <button
+                                    className='h-10 w-10 hover:bg-slate-500'
+                                    onClick={() => removeClipboardItem(id)}
+                                >
+                                    X
+                                </button>
+                            </div>
                         </li>
                     )
                 })}
+                {totalAmount > 0 ? (
+                    <li className='w-full h-10 text-black flex text-xl bg-red-300 hover:bg-red-400 rounded-2xl'>
+                        <button className='w-full h-10 flex items-center px-2'
+                                onClick={() => removeAllClipboardItems()}>
+                            Clear history
+                        </button>
+                    </li>
+                ) : (
+                    <li className='w-full h-10 text-gray-500 text-xl bg-white flex items-center px-2 rounded-2xl'>
+                        Nothing in your clipboard history yet.
+                    </li>
+                )}
             </ul>
         </div>
     </div>

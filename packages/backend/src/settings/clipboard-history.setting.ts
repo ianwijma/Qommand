@@ -11,7 +11,11 @@ import {eventHandler} from "../utils/eventHandler";
 import {
     restoreClipboardHistoryEventName, RestoreClipboardHistoryEventData
 } from "@qommand/common/src/events/restoreClipboardHistory.event";
+import {
+    clearClipboardHistoryEventName, ClearClipboardHistoryEventData
+} from "@qommand/common/src/events/clearClipboardHistory.event";
 import {clipboard, nativeImage} from "electron";
+import {confirmDialog} from "../windows/dialog.window";
 
 
 const compressPromiseFn = promisify(zlib.deflate);
@@ -160,7 +164,6 @@ eventHandler.listen<RestoreClipboardHistoryEventData>(restoreClipboardHistoryEve
                 // TODO: A lot of images are HTML elements when copied from the web...
                 clipboard.writeImage(imageNative, 'clipboard');
             }
-                // TODO: Add copying files, maybe?
                 break;
         }
 
@@ -173,4 +176,23 @@ eventHandler.listen<RestoreClipboardHistoryEventData>(restoreClipboardHistoryEve
             ]
         })
     }
+});
+
+eventHandler.listen<ClearClipboardHistoryEventData>(clearClipboardHistoryEventName, async ({ids}) => {
+    const settings = clipboardHistorySettings.getSettings();
+    const {clipboardHistory} = settings;
+
+    if (ids.length > 1) {
+        const {confirmed} = await confirmDialog.open({
+            title: 'Confirm',
+            message: `You're about to remove ${ids.length} items, are you sure?`,
+        });
+
+        if (!confirmed) return; // Stop it
+    }
+
+    await clipboardHistorySettings.updateSettings({
+        ...settings,
+        clipboardHistory: clipboardHistory.filter(({id}) => !ids.includes(id))
+    })
 });

@@ -1,10 +1,10 @@
 import {BaseSettings} from "../settings.types";
 
-export type BaseClipboardHistoryItemHashId = string; // Items main hash
-export type BaseClipboardHistoryItemTypes = 'text' | 'html' | 'image'
+export type ClipboardHistoryItemHashId = string; // Items main hash
+export type ClipboardHistoryItemTypes = 'text' | 'html' | 'image'
 export type BaseClipboardHistoryItem = {
-    type: BaseClipboardHistoryItemTypes;
-    id: BaseClipboardHistoryItemHashId;
+    type: ClipboardHistoryItemTypes;
+    id: ClipboardHistoryItemHashId;
 }
 
 export type ClipboardHistoryItemText = BaseClipboardHistoryItem & {
