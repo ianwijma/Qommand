@@ -117,9 +117,8 @@ const createClipboardChanges = () => {
         },
         stopListening: () => {
             if (intervalId) {
-                intervalId = undefined;
-
                 clearInterval(intervalId);
+                intervalId = undefined;
             }
         },
         onChange: (callback: (event: ClipboardChangeEvents) => Promise<void> | void) => {

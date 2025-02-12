@@ -31,7 +31,7 @@ type Result = {
     title: string;
 }
 
-export default function AboutPage() {
+export default function ClipboardHistoryPage() {
     const {close} = useWindowControls();
     const inputRef = useRef<HTMLInputElement>(null);
     const selectedRef = useRef<HTMLLIElement>(null);
@@ -185,7 +185,7 @@ export default function AboutPage() {
                                     className='w-full h-10 flex items-center px-2 truncate'
                                     onClick={() => restoreClipboardItem(id)}
                                 >
-                                    {type === 'image' ? <img src={title} alt='image'/> : title}
+                                    {type === 'image' ? <img src={title} alt='Clipboard image content'/> : title}
                                 </button>
                                 <button
                                     className='h-10 w-10 hover:bg-slate-500'
