@@ -117,7 +117,7 @@ const createClipboardChanges = () => {
         stopListening: () => {
             if (intervalId) {
                 clearInterval(intervalId);
-                
+
                 intervalId = undefined;
             }
         },
