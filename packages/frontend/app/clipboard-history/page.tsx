@@ -81,7 +81,6 @@ export default function AboutPage() {
                 }
                 case 'image': {
                     const {image} = item;
-                    console.log('image', {image})
                     return {
                         id,
                         type,
