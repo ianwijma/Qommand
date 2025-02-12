@@ -114,7 +114,6 @@ clipboardChanges.onChange(async (event) => {
         case 'text': {
             const {text, textHash} = event;
             const id = textHash;
-            // TODO: Fix large text being compressed one way.
             await addClipboardHistoryItem({type, id, textHash, text});
         }
             break;
@@ -153,7 +152,6 @@ eventHandler.listen<RestoreClipboardHistoryEventData>(restoreClipboardHistoryEve
             case 'html': {
                 const {html, text} = targetClipboardHistoryItem;
                 clipboardChanges.updateHash({html, text});
-                // TODO: Writing HTML does not seem to work, Writing text does seems to work
                 clipboard.writeText(text, 'clipboard');
             }
                 break;
