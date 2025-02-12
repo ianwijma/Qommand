@@ -44,7 +44,7 @@ const createClipboardChanges = () => {
         eventEmitter.emit<ClipboardImageChangeEvent>('change', event);
     }
 
-    let intervalId: undefined | number;
+    let intervalId: NodeJS.Timeout | undefined;
 
     let htmlHash: string;
     let textHash: string;
@@ -66,7 +66,6 @@ const createClipboardChanges = () => {
             imageHash = hash(imageInitial.toDataURL());
 
             if (!intervalId) {
-                // @ts-expect-error - Expects a NodeJS.Timeout?
                 intervalId = setInterval(() => {
                     const html = clipboard.readHTML('clipboard');
                     if (html !== '') {
@@ -117,9 +116,9 @@ const createClipboardChanges = () => {
         },
         stopListening: () => {
             if (intervalId) {
-                intervalId = undefined;
-
                 clearInterval(intervalId);
+                
+                intervalId = undefined;
             }
         },
         onChange: (callback: (event: ClipboardChangeEvents) => Promise<void> | void) => {
