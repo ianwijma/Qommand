@@ -41,6 +41,14 @@ export default function ClipboardHistoryPage() {
 
     const {isLoading, settings} = useSettings<ClipboardHistorySettings>('clipboard');
 
+    const getSelectedItem = (): Result | undefined => {
+        if (selected) {
+            return results[selected]
+        }
+
+        return undefined;
+    }
+
     const restoreClipboardItem = useCallback((id: ClipboardHistoryItemHashId) => {
         eventHandler.emit<RestoreClipboardHistoryEventData>(restoreClipboardHistoryEventName, {clipboardHistoryItemHashId: id});
 
@@ -48,6 +56,7 @@ export default function ClipboardHistoryPage() {
     }, [settings]);
 
     const removeClipboardItem = useCallback((id: ClipboardHistoryItemHashId) => {
+        // TODO: currently it can take a bit before items are being removed, so we might need to come up with a way to remove an item before the change is saved.
         eventHandler.emit<ClearClipboardHistoryEventData>(clearClipboardHistoryEventName, {ids: [id]});
     }, [settings]);
 
@@ -115,7 +124,12 @@ export default function ClipboardHistoryPage() {
     const resultAmount = results.length;
     const increaseSelected = useCallback(() => selected < (resultAmount - 1) && setSelected(selected + 1), [selected, resultAmount, setSelected]);
     const decreaseSelected = useCallback(() => selected !== 0 && setSelected(selected - 1), [selected, setSelected]);
-    const confirmSelected = useCallback(() => restoreClipboardItem(results[selected].id), [results, selected, restoreClipboardItem]);
+    const confirmSelected = useCallback(() => {
+        const item = getSelectedItem();
+        if (item) {
+            restoreClipboardItem(item.id)
+        }
+    }, [results, selected, restoreClipboardItem]);
 
     useEffect(() => {
         if (!inputRef.current) return;
@@ -124,6 +138,7 @@ export default function ClipboardHistoryPage() {
 
         inputEl.onblur = () => inputEl.focus();
         inputEl.onkeydown = ({code}) => {
+            console.log('code', {code})
             switch (code) {
                 case 'ArrowDown':
                     increaseSelected();
@@ -136,6 +151,12 @@ export default function ClipboardHistoryPage() {
                     break;
                 case 'Escape':
                     close();
+                    break;
+                case 'Delete':
+                    const item = getSelectedItem();
+                    if (item) {
+                        removeClipboardItem(item.id)
+                    }
                     break;
             }
         }
