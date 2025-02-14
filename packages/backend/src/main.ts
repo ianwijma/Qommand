@@ -18,9 +18,6 @@ import {keyboardShortcuts} from "./utils/keyboard-shortcuts";
 import {searchSettings} from "./settings/search.setting";
 import {commandRunner} from "./utils/commandRunner";
 import {windowManager} from "./utils/windowManager";
-import {clipboardHistorySettings} from "./settings/clipboard-history.setting";
-import {clipboardChanges} from "./utils/clipboard-changes-event";
-import {clipboardHistoryWindow} from "./windows/clipboard-history.window";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -45,7 +42,6 @@ if (!isSingleInstance) {
         await commandsFolderSettings.initialize();
         await commandsSettings.initialize();
         await searchSettings.initialize();
-        await clipboardHistorySettings.initialize();
 
         if (startupArguments.reset) {
             await resetAllSettings();
@@ -54,14 +50,12 @@ if (!isSingleInstance) {
         // Windows
         await commandsWindow.initialize();
         await runnerWindow.initialize();
-        await clipboardHistoryWindow.initialize();
         await aboutWindow.initialize();
 
         // Background Processes
         await keyboardShortcuts.initialize();
         await commandRunner.initialize();
         await windowManager.initialize();
-        await clipboardChanges.startListening();
 
         if (isDev()) {
             await receiveWindow.initialize();
