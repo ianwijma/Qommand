@@ -1,6 +1,5 @@
 {
   "name": "@qommand/frontend",
-  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 8080 --turbopack",
