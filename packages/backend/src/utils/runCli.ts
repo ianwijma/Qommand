@@ -18,8 +18,8 @@ export const runCli = async (base: string, args: string | string[], options: Spa
             exitCode = code;
             resolve({
                 exitCode,
-                out: standardOut.join(''),
-                error: standardError.join('')
+                out: standardOut.join('').trim(),
+                error: standardError.join('').trim()
             });
         });
     });
@@ -29,7 +29,7 @@ export const runCliPromise = async (base: string, args: string | string[], optio
     const {exitCode, out, error} = await runCli(base, args, options);
 
     if (exitCode === 0) {
-        return out.trim();
+        return out;
     } else {
         throw new Error(error);
     }
