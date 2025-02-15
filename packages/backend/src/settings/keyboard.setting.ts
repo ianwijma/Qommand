@@ -10,10 +10,6 @@ export const keyboardSettings = createSettings<KeyboardSettings>({
             [isMac() ? 'Control+m' : 'Control+m']: {
                 target: 'window',
                 targetId: 'runner'
-            },
-            [isMac() ? 'Control+Command+h' : 'Control+Super+h']: {
-                target: 'window',
-                targetId: 'clipboard-history'
             }
         }
     },
